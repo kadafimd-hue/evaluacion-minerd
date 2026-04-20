@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP 2026: Bloque II - Liderazgo y Gestión TIC</title>
+    <style>
+        :root { --minerd-blue: #004a99; --accent: #0056b3; --success: #28a745; --danger: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .quiz-container { background: white; width: 100%; max-width: 800px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: var(--minerd-blue); color: white; padding: 25px; text-align: center; border-bottom: 5px solid #ffd700; }
+        .progress-bar { height: 8px; background: #e0e0e0; width: 100%; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: 0.5s; }
+        .stats { display: flex; justify-content: space-between; padding: 12px 25px; background: #f8f9fa; font-weight: bold; font-size: 0.9em; border-bottom: 1px solid #ddd; }
+        .content { padding: 35px; min-height: 350px; }
+        .tag { font-size: 0.75em; text-transform: uppercase; background: #e7f0ff; color: var(--minerd-blue); padding: 4px 12px; border-radius: 15px; display: inline-block; margin-bottom: 20px; font-weight: bold; }
+        .question-text { font-size: 1.2em; font-weight: 600; color: #2c3e50; margin-bottom: 25px; line-height: 1.5; }
+        .options-grid { display: grid; gap: 12px; }
+        .option-btn { text-align: left; padding: 15px; border: 2px solid #edf2f7; border-radius: 8px; background: white; cursor: pointer; transition: 0.2s; font-size: 1em; color: #4a5568; }
+        .option-btn:hover:not(:disabled) { border-color: var(--accent); background: #f0f7ff; }
+        .option-btn.correct { background: #d4edda !important; border-color: var(--success) !important; color: #155724; font-weight: bold; }
+        .option-btn.incorrect { background: #f8d7da !important; border-color: var(--danger) !important; color: #721c24; }
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; line-height: 1.5; border: 1px solid transparent; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .feedback.correct { background: #e6fffa; border-color: #38b2ac; color: #234e52; }
+        .feedback.incorrect { background: #fff5f5; border-color: #feb2b2; color: #822727; }
+        .footer { padding: 20px 35px; text-align: right; background: #f8f9fa; border-top: 1px solid #eee; }
+        .btn-next { background: var(--minerd-blue); color: white; border: none; padding: 12px 30px; border-radius: 6px; cursor: pointer; font-size: 1em; display: none; font-weight: bold; }
+        .result-screen { text-align: center; padding: 50px 20px; display: none; }
+        .score-display { font-size: 4em; font-weight: 800; color: var(--minerd-blue); margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <h2 style="margin:0">ERP 2026: BLOQUE II - GESTIÓN Y ESTRATEGIA</h2>
+        <p style="margin:5px 0 0 0; font-size: 0.9em; opacity: 0.9;">Simulacro para Dinamizadores TIC</p>
+    </div>
+    <div class="progress-bar"><div id="progFill" class="progress-fill"></div></div>
+    <div class="stats">
+        <span>Caso <span id="qIdx">16</span> de 30</span>
+        <span>Puntuación: <span id="score">0</span></span>
+    </div>
+
+    <div id="quizBody" class="content">
+        <div id="blockTag" class="tag"></div>
+        <div id="qText" class="question-text"></div>
+        <div id="optionsArea" class="options-grid"></div>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <div id="resultArea" class="result-screen">
+        <div class="tag">Simulacro Bloque II Completado</div>
+        <div class="score-display" id="finalScore">0</div>
+        <p id="resultMsg" style="font-size: 1.1em; color: #4a5568;"></p>
+        <button class="btn-next" style="display:inline-block; margin-top: 20px;" onclick="location.reload()">Reiniciar Bloque</button>
+    </div>
+
+    <div class="footer" id="quizFooter">
+        <button id="nextBtn" class="btn-next" onclick="nextQuestion()">Siguiente Caso</button>
+    </div>
+</div>
+
+<script>
+    const casos = [
+        {
+            t: "Gestión Operativa y POA",
+            q: "El Equipo de Gestión de la Escuela Luz María Batista Germán se reúne para elaborar el POA. El Director propone comprar solo libros físicos porque 'la luz se va mucho'. ¿Cómo intervienes estratégicamente?",
+            o: [
+                "Aceptar la decisión para no entrar en conflicto con el Director.",
+                "Proponer la adquisición de recursos digitales que funcionen offline (como eXeLearning o carpetas locales) y asegurar que el POA incluya el mantenimiento del inversor/SAI del centro.",
+                "Decirle que es una decisión ilegal y que reportarás al Distrito si no compran laptops.",
+                "Quedarte callado y comprar los recursos digitales con tu propio dinero después."
+            ],
+            c: 1,
+            r: "El dinamizador debe ser propositivo, ofreciendo soluciones técnicas (uso offline) y asegurando que la infraestructura eléctrica sea prioridad en el plan operativo."
+        },
+        {
+            t: "Soporte Técnico y Pedagogía",
+            q: "Varias laptops de la serie HP 15-fd de los docentes presentan lentitud extrema al abrir el SIGERD. Tras revisar, notas que el antivirus está escaneando simultáneamente. ¿Qué haces?",
+            o: [
+                "Desinstalar el antivirus de todas las laptops para que funcionen rápido.",
+                "Programar los escaneos automáticos fuera del horario de carga de notas y optimizar el inicio de Windows desactivando procesos innecesarios.",
+                "Decirle a los maestros que no usen el SIGERD hasta que el Ministerio mande laptops nuevas.",
+                "Sugerir a los docentes que carguen las notas desde sus celulares personales."
+            ],
+            c: 1,
+            r: "La gestión técnica implica optimizar los recursos existentes sin comprometer la seguridad de la información."
+        },
+        {
+            t: "Ética y Responsabilidad Profesional",
+            q: "Un docente te pide que le instales un programa para 'descargar música y películas' en su laptop institucional. Argumenta que lo usará para poner canciones en el recreo. ¿Qué haces?",
+            o: [
+                "Instalarlo, ya que el recreo también es parte de la vida escolar.",
+                "Negarte amablemente, explicando que la política del MINERD prohíbe software no autorizado y proponerle el uso de plataformas oficiales de streaming educativo.",
+                "Decirle que lo instale él mismo para que usted no tenga la responsabilidad.",
+                "Cobrarle una pequeña cuota por el servicio técnico fuera de horario."
+            ],
+            c: 1,
+            r: "El dinamizador es el guardián de la integridad del software institucional y debe cumplir con la normativa de uso de equipos."
+        },
+        {
+            t: "Acompañamiento a la Diversidad",
+            q: "Se integra al centro un nuevo estudiante con discapacidad auditiva en 5to grado. El maestro de Lengua Española quiere usar videos. ¿Cuál es tu asesoría técnica?",
+            o: [
+                "Sugerir que el estudiante haga una tarea diferente mientras los demás ven el video.",
+                "Ayudar al docente a encontrar videos con subtítulos (CC) o usar herramientas de transcripción en tiempo real para la PDI.",
+                "Pedir un intérprete de señas al Distrito y no usar tecnología hasta que llegue.",
+                "Decirle al maestro que no use videos para no excluir al niño."
+            ],
+            c: 1,
+            r: "La tecnología es un aliado de la inclusión (DUA) si se seleccionan las herramientas y configuraciones correctas."
+        },
+        {
+            t: "Gestión de Crisis Tecnológica",
+            q: "Durante la 'Semana de las Niñas en las TIC', el internet del centro falla totalmente minutos antes de tu presentación sobre IA. ¿Cómo demuestras tu competencia de gestión?",
+            o: [
+                "Suspender el evento y pedir disculpas a los invitados.",
+                "Ejecutar tu 'Plan de Continuidad': usar la versión descargada de la presentación y realizar actividades interactivas locales que no requieran web.",
+                "Llamar desesperadamente al soporte técnico frente a los estudiantes.",
+                "Pedir a los padres que compartan internet desde sus celulares personales."
+            ],
+            c: 1,
+            r: "Un dinamizador preparado siempre tiene un plan de contingencia offline para asegurar el proceso pedagógico."
+        },
+        {
+            t: "Liderazgo y Trabajo en Equipo",
+            q: "La Coordinadora Pedagógica nota que los maestros no están usando las PDI. Te pide un plan de acción. ¿Cuál es el más efectivo?",
+            o: [
+                "Hacer una lista de los maestros que no la usan y entregarla a la Dirección.",
+                "Organizar 'Micro-Cápsulas' de capacitación de 15 minutos por grado, enfocadas en funciones específicas que les ahorren trabajo (como el uso de pizarras digitales).",
+                "Pegar el manual de la PDI en la puerta de cada aula.",
+                "Dar una charla de 3 horas sobre la historia de las pantallas digitales."
+            ],
+            c: 1,
+            r: "El liderazgo efectivo en TIC se basa en la formación práctica, corta y útil que resuelva problemas reales del docente."
+        },
+        {
+            t: "Ciberseguridad en el Centro",
+            q: "Detectas que una cuenta institucional de un docente está enviando correos extraños (Spam) a otros maestros. ¿Cuál es el protocolo inmediato?",
+            o: [
+                "Ignorarlo, pensando que es un error del servidor del Ministerio.",
+                "Cambiar la contraseña inmediatamente, cerrar sesiones activas y revisar el equipo del docente en busca de malware (Phishing).",
+                "Publicar en el grupo de WhatsApp que nadie abra correos de ese profesor.",
+                "Borrar la cuenta del docente definitivamente."
+            ],
+            c: 1,
+            r: "La respuesta rápida ante incidentes de seguridad protege la reputación y los datos de toda la comunidad educativa."
+        },
+        {
+            t: "Evaluación de Impacto TIC",
+            q: "El Director te pregunta si valió la pena la inversión en el proyecto de Robótica. ¿Qué evidencia presentas para la Evaluación de Desempeño?",
+            o: [
+                "Una foto de los kits de robótica guardados y limpios en el armario.",
+                "Un informe comparativo de las calificaciones en matemáticas y lógica de los niños participantes versus sus resultados anteriores.",
+                "El recibo de compra de los materiales.",
+                "Una lista de asistencia de los niños al laboratorio."
+            ],
+            c: 1,
+            r: "El éxito de la TIC se mide por la mejora en el aprendizaje y el desarrollo de competencias, no por la existencia del hardware."
+        },
+        {
+            t: "Protección del Menor y Ética",
+            q: "Un docente quiere crear un canal de YouTube de la clase y subir videos de los niños exponiendo. ¿Qué requisito legal debes recordarle?",
+            o: [
+                "Que el video debe tener buena iluminación.",
+                "La autorización escrita de los padres o tutores para el uso de la imagen de los menores y la configuración de privacidad 'Contenido para niños'.",
+                "Que no puede usar música con derechos de autor.",
+                "Que debe poner el logo del centro en una esquina del video."
+            ],
+            c: 1,
+            r: "La protección de la imagen del menor es una responsabilidad legal y ética crítica en el entorno digital escolar."
+        },
+        {
+            t: "Mantenimiento y Diagnóstico",
+            q: "Una laptop Lenovo ThinkPad del centro no carga. Pruebas con otro cargador y sigue igual. ¿Cuál es tu recomendación técnica?",
+            o: [
+                "Comprar una batería nueva inmediatamente.",
+                "Revisar el puerto de carga físico, actualizar el firmware de gestión de energía y, si persiste, reportar el fallo de la placa base al Distrito.",
+                "Decirle al docente que use la laptop conectada siempre.",
+                "Abrir la laptop y tratar de soldar las piezas usted mismo sin autorización."
+            ],
+            c: 1,
+            r: "El diagnóstico profesional agota las causas lógicas y de firmware antes de sugerir gastos en hardware o reparaciones físicas."
+        },
+        {
+            t: "Innovación Curricular",
+            q: "Para el proyecto 'Titanes de la Patria', un maestro quiere que los niños memoricen fechas. Tú sugieres usar Minecraft o un juego de roles digital. ¿Por qué?",
+            o: [
+                "Porque así los niños no se aburren y tú tienes menos trabajo.",
+                "Porque promueve el aprendizaje inmersivo y el desarrollo de la competencia de pensamiento crítico sobre la historia.",
+                "Porque es un requisito del Ministerio usar juegos en todas las clases.",
+                "Porque el centro tiene muchas laptops y hay que usarlas para que no se dañen."
+            ],
+            c: 1,
+            r: "La innovación busca transformar la forma de aprender, pasando de la memoria pasiva a la construcción activa del conocimiento."
+        },
+        {
+            t: "Gestión de Datos y Privacidad",
+            q: "Un técnico de una empresa externa viene a 'revisar el internet' y te pide la clave del Wi-Fi administrativo y acceso al servidor. ¿Qué haces?",
+            o: [
+                "Dársela de inmediato para que termine rápido el trabajo.",
+                "Solicitar su identificación oficial, confirmar con el Distrito/Director la visita y supervisar personalmente su acceso a la red.",
+                "Negarle el acceso y decirle que trabaje desde afuera de la escuela.",
+                "Darle una clave falsa para ver qué hace."
+            ],
+            c: 1,
+            r: "La seguridad física y lógica de la red administrativa del centro depende de protocolos estrictos de acceso a terceros."
+        },
+        {
+            t: "Acompañamiento Técnico-Pedagógico",
+            q: "Un docente de 1er grado de primaria quiere usar tablets. Tienes miedo de que los niños las rompan. ¿Cómo gestionas el caso?",
+            o: [
+                "Prohibir el uso de tablets en 1er grado hasta que los niños sean más grandes.",
+                "Establecer un protocolo de manejo (uso en mesa, manos limpias) y acompañar al docente en las primeras sesiones para modelar el cuidado.",
+                "Dejar que el docente las use solo y que él se haga responsable si se rompen.",
+                "Darle solo las tablets que ya están viejas o dañadas."
+            ],
+            c: 1,
+            r: "El dinamizador educa en el uso y cuidado del recurso; la exclusión por miedo al daño limita el derecho al aprendizaje digital."
+        },
+        {
+            t: "Resolución de Conflictos",
+            q: "El Coordinador TIC del Distrito te pide un informe que tú ya enviaste, pero él dice que 'no le llegó'. ¿Cómo respondes profesionalmente?",
+            o: [
+                "Pelear con él por teléfono y decirle que revise bien su correo.",
+                "Reenviar el correo original (donde se vea la fecha y hora del primer envío) con un mensaje cortés poniéndote a su disposición.",
+                "No responder y esperar a que él lo encuentre solo.",
+                "Quejarse con el Director del centro sobre la ineficiencia del técnico distrital."
+            ],
+            c: 1,
+            r: "La evidencia digital y la comunicación asertiva son las mejores herramientas para resolver malentendidos administrativos."
+        },
+        {
+            t: "Visión Estratégica TIC",
+            q: "Al final de tu gestión anual, notas que el 80% de los docentes usa la tecnología solo para proyectar videos. ¿Cuál es tu conclusión para el próximo POA?",
+            o: [
+                "Que los docentes no quieren aprender y es mejor no invertir más en TIC.",
+                "Que se debe pasar de la etapa de 'Sustitución' a la de 'Modificación/Redefinición' mediante talleres de creación de contenido.",
+                "Que el internet es muy bueno y por eso ven muchos videos.",
+                "Que necesitas más proyectores para llegar al 100% de los docentes."
+            ],
+            c: 1,
+            r: "La evaluación de resultados debe servir para elevar el nivel de integración pedagógica (Modelo SAMR) en el centro."
+        }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let shuffledOpts = [];
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function render() {
+        const data = casos[current];
+        document.getElementById('blockTag').innerText = data.t;
+        document.getElementById('qText').innerText = data.q;
+        document.getElementById('qIdx').innerText = current + 16;
+        document.getElementById('score').innerText = score;
+
+        const area = document.getElementById('optionsArea');
+        area.innerHTML = '';
+        
+        shuffledOpts = data.o.map((text, index) => ({ text, isCorrect: index === data.c }));
+        shuffle(shuffledOpts);
+
+        shuffledOpts.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => check(idx);
+            area.appendChild(btn);
+        });
+
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+        
+        const prog = (current / casos.length) * 100;
+        document.getElementById('progFill').style.width = prog + '%';
+    }
+
+    function check(idx) {
+        const btns = document.querySelectorAll('.option-btn');
+        const fb = document.getElementById('feedback');
+        btns.forEach(b => b.disabled = true);
+
+        if (shuffledOpts[idx].isCorrect) {
+            score++;
+            btns[idx].classList.add('correct');
+            fb.innerHTML = `<strong>✅ RESOLUCIÓN CORRECTA:</strong> ${casos[current].r}`;
+            fb.className = 'feedback correct';
+        } else {
+            btns[idx].classList.add('incorrect');
+            const cPos = shuffledOpts.findIndex(o => o.isCorrect);
+            btns[cPos].classList.add('correct');
+            fb.innerHTML = `<strong>❌ ERROR DE CRITERIO:</strong> ${casos[current].r}`;
+            fb.className = 'feedback incorrect';
+        }
+
+        fb.style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'inline-block';
+        document.getElementById('score').innerText = score;
+    }
+
+    function nextQuestion() {
+        current++;
+        if (current < casos.length) {
+            render();
+        } else {
+            finish();
+        }
+    }
+
+    function finish() {
+        document.getElementById('quizBody').style.display = 'none';
+        document.getElementById('quizFooter').style.display = 'none';
+        document.getElementById('resultArea').style.display = 'block';
+        document.getElementById('progFill').style.width = '100%';
+        document.getElementById('finalScore').innerText = score;
+        
+        const msg = document.getElementById('resultMsg');
+        const p = (score / casos.length) * 100;
+        if (p >= 90) msg.innerText = "¡Excelente capacidad de liderazgo! Estás listo para coordinar cualquier proyecto tecnológico ministerial.";
+        else if (p >= 70) msg.innerText = "Buen nivel de gestión. Recuerda siempre documentar tus procesos para tener evidencias sólidas.";
+        else msg.innerText = "Debes reforzar tus conocimientos sobre normativas y protocolos administrativos del MINERD.";
+    }
+
+    render();
+</script>
+
+</body>
+</html>
