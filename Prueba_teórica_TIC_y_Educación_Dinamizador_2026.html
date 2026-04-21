@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulacro ERP: Integración y Ciudadanía Digital</title>
+    <style>
+        :root { --primary: #004a99; --secondary: #007bff; --success: #28a745; --danger: #dc3545; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .quiz-card { background: white; width: 100%; max-width: 750px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: var(--primary); color: white; padding: 20px; text-align: center; }
+        .progress-container { background: #e9ecef; height: 8px; }
+        .progress-bar { background: var(--success); height: 100%; width: 0%; transition: 0.4s; }
+        .stats { display: flex; justify-content: space-between; padding: 10px 20px; background: #f8f9fa; font-weight: bold; font-size: 0.9em; border-bottom: 1px solid #eee; }
+        .content { padding: 30px; min-height: 380px; }
+        .block-tag { font-size: 0.75em; text-transform: uppercase; background: #e7f0ff; color: var(--primary); padding: 5px 15px; border-radius: 20px; display: inline-block; margin-bottom: 15px; font-weight: bold; }
+        .question-text { font-size: 1.2em; font-weight: 600; color: #1c1e21; margin-bottom: 25px; line-height: 1.5; }
+        .options-list { display: grid; gap: 12px; }
+        .option-btn { text-align: left; padding: 15px; border: 2px solid #ebedf0; border-radius: 10px; background: white; cursor: pointer; transition: 0.2s; font-size: 1em; }
+        .option-btn:hover:not(:disabled) { border-color: var(--secondary); background: #f0f7ff; }
+        .option-btn.correct { background: #d4edda !important; border-color: var(--success) !important; color: #155724; font-weight: bold; }
+        .option-btn.incorrect { background: #f8d7da !important; border-color: var(--danger) !important; color: #721c24; }
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; font-size: 0.95em; line-height: 1.4; border: 1px solid transparent; }
+        .feedback.correct { background: #e6fffa; border-color: #38b2ac; color: #234e52; }
+        .feedback.incorrect { background: #fff5f5; border-color: #feb2b2; color: #822727; }
+        .footer { padding: 20px; text-align: right; background: #f8f9fa; }
+        .btn-next { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-size: 1em; font-weight: bold; display: none; }
+        .result-screen { text-align: center; padding: 50px 20px; display: none; }
+        .final-score { font-size: 4em; font-weight: bold; color: var(--primary); margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-card">
+    <div class="header"><h2 style="margin:0">Simulacro ERP: Pedagogía y TIC</h2></div>
+    <div class="progress-container"><div id="progBar" class="progress-bar"></div></div>
+    <div class="stats">
+        <span>Pregunta <span id="qIdx">1</span> de 30</span>
+        <span>Puntos: <span id="score">0</span></span>
+    </div>
+
+    <div id="quizArea" class="content">
+        <div id="blockTag" class="block-tag"></div>
+        <div id="qText" class="question-text"></div>
+        <div id="options" class="options-list"></div>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <div id="resultArea" class="result-screen">
+        <div class="block-tag">Resultado Final</div>
+        <div class="final-score" id="totalScore">0</div>
+        <p id="resultMsg" style="font-size: 1.2em;"></p>
+        <button class="btn-next" style="display:inline-block; margin-top:20px;" onclick="location.reload()">Reiniciar Simulacro</button>
+    </div>
+
+    <div class="footer" id="footer">
+        <button id="nextBtn" class="btn-next" onclick="loadNext()">Siguiente Pregunta</button>
+    </div>
+</div>
+
+<script>
+    const banco = [
+        // BLOQUE I - Integración Pedagógica (1-15)
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "¿Cuál es el propósito fundamental de la Integración Curricular de las TIC según el currículo dominicano?", o: ["Que la tecnología sirva como medio para alcanzar los indicadores de logro de las diversas áreas del saber.", "Eliminar el uso de libros de texto en todas las escuelas.", "Sustituir al docente por programas educativos automatizados.", "Aprender a usar los programas de oficina para trabajar."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "¿Qué implica la 'Brecha Digital de Segundo Grado' en un centro educativo?", o: ["La diferencia en las habilidades y el uso efectivo que docentes y alumnos dan a la tecnología, aunque tengan el equipo.", "La falta de electricidad en las aulas.", "Que el internet sea muy lento en el segundo piso.", "La falta de cables y dispositivos físicos."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "Al planificar una unidad didáctica con TIC, ¿qué debe seleccionarse primero según el diseño instruccional correcto?", o: ["La competencia y el indicador de logro que se desea alcanzar.", "La cantidad de laptops disponibles.", "La herramienta digital (ej. Canva o Kahoot).", "El video que se va a proyectar."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "¿Qué es la 'Alfabetización Informacional'?", o: ["La capacidad de identificar, localizar, evaluar y utilizar la información de manera efectiva para resolver un problema.", "Aprender a escribir con todos los dedos.", "Saber configurar un correo electrónico.", "Saber encender la computadora rápido."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "¿A qué se refiere el término 'Aprendizaje Colaborativo mediado por TIC'?", o: ["Al uso de herramientas digitales para que un grupo construya conocimiento de forma conjunta e interactiva.", "A copiar y pegar información de Wikipedia.", "A que el docente le de la respuesta por WhatsApp.", "A que cada estudiante trabaje solo."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "En el modelo TPACK, ¿qué representa la intersección del TPK (Pedagógico + Tecnológico)?", o: ["Comprender cómo una herramienta tecnológica específica puede cambiar la forma en que los estudiantes aprenden un concepto.", "Dar una clase tradicional usando una diapositiva.", "Saber reparar una computadora usada en clase.", "Saber el nombre de todos los componentes."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "¿Cuál es una característica principal del Aprendizaje Basado en Proyectos (ABP) cuando se integra con TIC?", o: ["El uso de la tecnología para la investigación y creación de un producto final que resuelva un reto real.", "Hacer un examen digital mensual.", "Que los estudiantes solo busquen imágenes.", "Que el Dinamizador haga el proyecto."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "¿Qué es un 'Objeto de Aprendizaje' (OA)?", o: ["Una unidad digital de información reutilizable con un propósito pedagógico definido.", "El proyector del aula.", "Un cuaderno digitalizado en PDF.", "Un mouse o un teclado nuevo."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "En el contexto de la Web 2.0, el estudiante pasa de ser consumidor a ser un:", o: ["Prosumidor (creador y consumidor de su propio contenido).", "Técnico de soporte.", "Espectador pasivo.", "Programador de sistemas."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "¿Cuál es la función pedagógica de un Simulador Virtual en Ciencias?", o: ["Permitir la experimentación en entornos seguros, controlados y repetibles.", "Ver videos de experimentos en YouTube.", "Sustituir los libros para ahorrar papel.", "Jugar videojuegos en clase."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "¿Qué es el 'Diseño Universal para el Aprendizaje' (DUA) aplicado a las TIC?", o: ["Un marco que utiliza la tecnología para ofrecer múltiples formas de representación, expresión y compromiso para todos.", "Usar tecnología solo para discapacidad.", "Diseñar una página web para la escuela.", "Que todas las laptops sean de la misma marca."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "¿A qué se refiere la 'Curaduría de Contenidos' del Dinamizador?", o: ["A filtrar, seleccionar y organizar la información digital más relevante para los docentes.", "A borrar virus.", "A escribir libros de texto.", "A vigilar que no entren a sitios prohibidos."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "¿Cuál es la principal ventaja de la Evaluación Formativa mediada por TIC?", o: ["La posibilidad de ofrecer retroalimentación inmediata durante el proceso.", "Ahorrar papel.", "Que el sistema califica solo sin docente.", "Publicar las notas en la web."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "¿Qué es la 'Netiqueta'?", o: ["El conjunto de normas de comportamiento y cortesía que deben seguirse en la comunicación digital.", "El precio del internet.", "Un programa para diseñar etiquetas.", "Una marca de computadoras."], c: 0 },
+        { b: "Bloque I: Integración Pedagógica y Estrategias TIC", q: "¿Qué actividad genera mayor retención según la pirámide del aprendizaje?", o: ["Enseñar a otros o crear contenido digital propio sobre el tema.", "Leer un PDF.", "Escuchar un podcast.", "Ver un video educativo."], c: 0 },
+
+        // BLOQUE II - Gestión y Ciudadanía (16-30)
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Qué es el PLE (Personal Learning Environment) de un docente?", o: ["El conjunto de herramientas, fuentes y conexiones que cada docente utiliza para aprender autónomamente.", "El sistema de nómina.", "El historial de búsqueda.", "El laboratorio asignado."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Cuál es la función de los 'Marcadores Sociales' (Diigo o Pinterest)?", o: ["Almacenar, clasificar y compartir enlaces web pedagógicos de forma colaborativa.", "Chatear con padres.", "Ponerle nombre a laptops.", "Dibujar sobre la PDI."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Qué permite una licencia Creative Commons de tipo 'BY-SA'?", o: ["Atribución al autor y compartir obras derivadas bajo la misma licencia.", "No modificar el original.", "Usar sin citar al autor.", "Vender el recurso."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Qué es el 'Cyberbullying'?", o: ["El acoso o intimidación constante a través de medios digitales entre pares.", "Un virus de Facebook.", "Tener correos sin leer.", "Fallo de internet por días."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Rol del Dinamizador frente a las Fake News?", o: ["Fomentar el pensamiento crítico y enseñar técnicas de verificación.", "Crear noticias para competir.", "Prohibir Google.", "Borrar noticias que no le gusten."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Qué es la 'Gamificación' en el aula?", o: ["La aplicación de mecánicas de juego en contextos no lúdicos para motivar el aprendizaje.", "Disfrazar al docente.", "Comprar consolas.", "Jugar videojuegos todo el día."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿A qué se refiere el término 'Mobile Learning' (m-Learning)?", o: ["Al aprendizaje facilitado a través de dispositivos móviles como tablets.", "A que el docente se mueva por la escuela.", "A computadoras con ruedas.", "Reparar celulares."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Qué es un 'Webinar'?", o: ["Seminario o conferencia en línea con interactividad en tiempo real.", "Página web pesada.", "Tipo de araña de cables.", "Examen por internet."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Principal ventaja de la 'Nube' para un equipo de gestión?", o: ["La colaboración en tiempo real y disponibilidad desde cualquier lugar.", "No necesita internet.", "Almacenamiento infinito gratis.", "Las PC no se calientan."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Qué busca la 'Ciudadanía Digital'?", o: ["Promover el uso responsable, ético, crítico y seguro de las tecnologías.", "Eliminar la nacionalidad física.", "Que los niños voten por internet.", "Que todos tengan laptop."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Qué factor técnico es vital para la equidad en videos educativos?", o: ["Que tenga subtítulos y sea liviano para baja conectividad.", "Resolución 4K.", "Que el presentador sea famoso.", "Que dure más de una hora."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Qué es el 'Software Libre' en educación?", o: ["Software que respeta la libertad de usar, estudiar, compartir y mejorar.", "Descarga ilegal.", "Software sin dueño.", "Software regalado."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Qué función cumplen las 'Rúbricas Digitales'?", o: ["Instrumentos con criterios claros y niveles de logro para evaluación.", "Nombres de archivos en nube.", "Listas de asistencia.", "Firmas digitales."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Qué es la 'Realidad Aumentada' aplicada a libros?", o: ["Superponer elementos digitales sobre el libro físico mediante dispositivos.", "Libro más grande físicamente.", "Colores más brillantes.", "Digitalizar a PDF."], c: 0 },
+        { b: "Bloque II: Gestión de Información y Ciudadanía Digital", q: "¿Objetivo de los EVA (Entornos Virtuales de Aprendizaje)?", o: ["Proporcionar un espacio organizado en red que facilite la interacción pedagógica.", "Controlar que no hablen.", "Vender cursos.", "Sustituir la escuela física totalmente."], c: 0 }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let shuffledOpts = [];
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function loadNext() {
+        currentIdx++; // Incremento añadido
+        if (currentIdx < banco.length) {
+            render();
+        } else {
+            finish();
+        }
+    }
+
+    function render() {
+        const data = banco[currentIdx];
+        document.getElementById('blockTag').innerText = data.b;
+        document.getElementById('qText').innerText = data.q;
+        document.getElementById('qIdx').innerText = currentIdx + 1;
+        document.getElementById('score').innerText = score;
+
+        const optionsArea = document.getElementById('options');
+        optionsArea.innerHTML = '';
+        
+        shuffledOpts = data.o.map((text, index) => ({ text, isCorrect: index === data.c }));
+        shuffle(shuffledOpts);
+
+        shuffledOpts.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => check(idx);
+            optionsArea.appendChild(btn);
+        });
+
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+        
+        const prog = (currentIdx / banco.length) * 100;
+        document.getElementById('progBar').style.width = prog + '%';
+    }
+
+    function check(idx) {
+        const btns = document.querySelectorAll('.option-btn');
+        const fb = document.getElementById('feedback');
+        btns.forEach(b => b.disabled = true);
+
+        if (shuffledOpts[idx].isCorrect) {
+            score++;
+            btns[idx].classList.add('correct');
+            fb.innerHTML = `<strong>✅ ¡Correcto!</strong>`;
+            fb.className = 'feedback correct';
+        } else {
+            btns[idx].classList.add('incorrect');
+            const cPos = shuffledOpts.findIndex(o => o.isCorrect);
+            btns[cPos].classList.add('correct');
+            fb.innerHTML = `<strong>❌ Incorrecto.</strong>`;
+            fb.className = 'feedback incorrect';
+        }
+
+        fb.style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'inline-block';
+        document.getElementById('score').innerText = score;
+    }
+
+    function finish() {
+        document.getElementById('quizArea').style.display = 'none';
+        document.getElementById('footer').style.display = 'none';
+        document.getElementById('resultArea').style.display = 'block';
+        document.getElementById('progBar').style.width = '100%';
+        document.getElementById('totalScore').innerText = score;
+        
+        const msg = document.getElementById('resultMsg');
+        const p = (score / banco.length) * 100;
+        if (p >= 90) msg.innerText = "¡Excelente preparación pedagógica!";
+        else if (p >= 70) msg.innerText = "¡Buen nivel! Sigue repasando los conceptos.";
+        else msg.innerText = "Se recomienda repasar los bloques de integración curricular.";
+    }
+
+    render();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulacro Teórico: Dinamizador TIC 2026</title>
+    <style>
+        :root { --minerd-blue: #004a99; --accent: #007bff; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .quiz-card { background: white; width: 100%; max-width: 750px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: var(--minerd-blue); color: white; padding: 20px; text-align: center; }
+        .progress-container { background: #e9ecef; height: 8px; }
+        .progress-bar { background: var(--success); height: 100%; width: 0%; transition: 0.4s; }
+        .stats { display: flex; justify-content: space-between; padding: 10px 20px; background: #f8f9fa; font-weight: bold; font-size: 0.9em; border-bottom: 1px solid #eee; }
+        .content { padding: 30px; min-height: 380px; }
+        .block-tag { font-size: 0.75em; text-transform: uppercase; background: #e7f0ff; color: var(--minerd-blue); padding: 5px 15px; border-radius: 20px; display: inline-block; margin-bottom: 15px; font-weight: bold; }
+        .question-text { font-size: 1.2em; font-weight: 600; color: #1c1e21; margin-bottom: 25px; line-height: 1.5; }
+        .options-list { display: grid; gap: 12px; }
+        .option-btn { text-align: left; padding: 15px; border: 2px solid #ebedf0; border-radius: 10px; background: white; cursor: pointer; transition: 0.2s; font-size: 1em; }
+        .option-btn:hover:not(:disabled) { border-color: var(--accent); background: #f0f5ff; }
+        .option-btn.correct { background: #d4edda !important; border-color: var(--success) !important; color: #155724; font-weight: bold; }
+        .option-btn.incorrect { background: #f8d7da !important; border-color: var(--danger) !important; color: #721c24; }
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; font-size: 0.95em; line-height: 1.4; border: 1px solid transparent; }
+        .feedback.correct { background: #e6fffa; border-color: #38b2ac; color: #234e52; }
+        .feedback.incorrect { background: #fff5f5; border-color: #feb2b2; color: #822727; }
+        .footer { padding: 20px; text-align: right; background: #f8f9fa; }
+        .btn-next { background: var(--minerd-blue); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-size: 1em; font-weight: bold; display: none; }
+        .result-screen { text-align: center; padding: 50px 20px; display: none; }
+        .final-score { font-size: 4em; font-weight: bold; color: var(--minerd-blue); margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-card">
+    <div class="header"><h2 style="margin:0">Simulacro ERP: Fundamentos Teóricos TIC</h2></div>
+    <div class="progress-container"><div id="progBar" class="progress-bar"></div></div>
+    <div class="stats">
+        <span>Pregunta <span id="qIdx">1</span> de 50</span>
+        <span>Puntos: <span id="score">0</span></span>
+    </div>
+
+    <div id="quizArea" class="content">
+        <div id="blockTag" class="block-tag"></div>
+        <div id="qText" class="question-text"></div>
+        <div id="options" class="options-list"></div>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <div id="resultArea" class="result-screen">
+        <div class="block-tag">Resultado Final</div>
+        <div class="final-score" id="totalScore">0</div>
+        <p id="resultMsg" style="font-size: 1.2em;"></p>
+        <button class="btn-next" style="display:inline-block; margin-top:20px;" onclick="location.reload()">Reiniciar Examen</button>
+    </div>
+
+    <div class="footer" id="footer">
+        <button id="nextBtn" class="btn-next" onclick="loadNext()">Siguiente Pregunta</button>
+    </div>
+</div>
+
+<script>
+    const banco = [
+        // BLOQUE I - Fundamentos Teóricos (1-15)
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Cuál es el documento normativo que establece los estándares de desempeño y las dimensiones que rigen el actual proceso de Evaluación de Desempeño Docente en la RD?", o: ["La Orden Departamental 50-2025.", "La Ley General de Educación 66-97.", "El Pacto Nacional para la Reforma Educativa.", "El Estatuto del Docente."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "En el contexto de la integración de las TIC en el currículo dominicano, ¿qué significa el acrónimo REA?", o: ["Recursos Educativos Abiertos.", "Recursos de Enseñanza Asistida.", "Red Educativa de Aprendizaje.", "Registro de Evaluación Automatizado."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Cuál es el modelo de integración tecnológica que describe la progresión desde el uso básico hasta la redefinición de nuevas tareas?", o: ["Modelo SAMR.", "Modelo ADDIE.", "Modelo TPACK.", "Taxonomía de Bloom Digital."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Qué componente de hardware se encarga de realizar todas las operaciones aritméticas y lógicas del sistema?", o: ["Unidad Central de Procesamiento (CPU).", "Memoria RAM.", "Placa Base (Motherboard).", "Unidad de Estado Sólido (SSD)."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Cuál de las siguientes topologías de red es la más común en los laboratorios donde todos los nodos se conectan a un dispositivo central?", o: ["Topología en Estrella.", "Topología en Bus.", "Topología en Malla.", "Topología en Anillo."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Qué competencia fundamental se fortalece de manera directa a través de la alfabetización digital y las TIC?", o: ["Competencia Científica y Tecnológica.", "Competencia Ética y Ciudadana.", "Competencia de Autoestimación y Cuidado Personal.", "Competencia Comunicativa."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Qué protocolo de red asigna automáticamente direcciones IP dinámicas?", o: ["DHCP.", "HTTP.", "TCP/IP.", "FTP."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿A qué se refiere el concepto 'Phishing' en la seguridad informática?", o: ["Al intento de engañar a usuarios para revelar claves mediante correos o mensajes falsos.", "A la instalación de software no autorizado.", "A la saturación de una red Wi-Fi.", "Al proceso de limpiar físicamente un servidor."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Cuál es la función principal de la plataforma SIGERD?", o: ["Gestionar la información administrativa, registros, asistencia y estadísticas.", "Servir como red social privada.", "Controlar el que el encendido remoto de laptops.", "Proveer recursos educativos para juegos."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Qué software es necesario para que el hardware se comunique con el sistema operativo?", o: ["Controlador (Driver).", "Navegador Web.", "Antivirus.", "Procesador de Texto."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Qué función cumple el SAI (o UPS)?", o: ["Proporcionar energía temporal ante fallos eléctricos y proteger contra picos.", "Almacenar archivos en la nube.", "Amplificar la señal Wi-Fi.", "Aumentar la velocidad del internet."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Cuál es el puerto de comunicación más utilizado para conectar periféricos como memorias y teclados?", o: ["Puerto USB (Universal Serial Bus).", "Puerto Paralelo (LPT).", "Puerto Serial (RS-232).", "Puerto VGA."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Qué significa el término 'Aprendizaje Ubicuo' apoyado por TIC?", o: ["La posibilidad de aprender en cualquier momento y lugar gracias a dispositivos móviles.", "Aprender únicamente dentro del laboratorio.", "Aprender sin necesidad de usar tecnología.", "Un método por radio."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Qué software permite estudiar, modificar y distribuir su código fuente libremente?", o: ["Software de Código Abierto (Open Source).", "Software de Prueba.", "Software Privativo.", "Freeware."], c: 0 },
+        { b: "Bloque I: Fundamentos Teóricos y Normativos", q: "¿Qué estándar internacional es el más utilizado para diseñar los marcos de competencia TIC?", o: ["Estándares ISTE.", "Protocolos IEEE.", "Normas ISO 9001.", "Manuales de Microsoft Office."], c: 0 },
+
+        // BLOQUE II - Mantenimiento (16-30)
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "¿Diferencia técnica principal entre un disco duro mecánico (HDD) y un sólido (SSD)?", o: ["El SSD no tiene piezas móviles, es más rápido y resistente.", "El HDD es más rápido pero consume más.", "El HDD es permanente y el SSD es temporal.", "No hay diferencia real."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "En una red Wi-Fi escolar, ¿qué función cumple un 'Access Point'?", o: ["Extender la red cableada de forma inalámbrica.", "Almacenar claves de docentes.", "Filtrar contenido de redes sociales.", "Dar electricidad inalámbrica."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "¿Qué proceso es el 'POST' (Power-On Self-Test)?", o: ["Verificación de hardware inicial por la BIOS/UEFI.", "Calibración de batería.", "Búsqueda de actualizaciones en internet.", "Escaneo del antivirus."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "¿Qué significa que un software sea de tipo 'SaaS'?", o: ["Que se accede a través del navegador web y datos en la nube.", "Que se instala desde un CD-ROM.", "Que funciona solo en servidores locales.", "Que es gratuito."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "¿Función de la Pasta Térmica?", o: ["Facilitar la transferencia de calor entre procesador y disipador.", "Evitar el polvo en la RAM.", "Pegar el procesador a la placa.", "Aumentar el voltaje."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "¿Qué es un ataque de 'Ransomware'?", o: ["Código que cifra archivos y pide un rescate económico.", "Robo de Wi-Fi.", "Programa que ralentiza la PC.", "Virus que borra fotos."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "Conexión de calidad audio/video digital con un solo cable a la PDI:", o: ["HDMI.", "RCA.", "Ethernet.", "VGA."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "Herramienta de Windows para ver consumo de RAM o CPU en tiempo real:", o: ["Administrador de Tareas.", "Símbolo del Sistema.", "Explorador de Archivos.", "Panel de Control."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "Ejemplo de IP privada de clase C común en escuelas:", o: ["192.168.1.10.", "127.0.0.1.", "8.8.8.8.", "www.minerd.gob.do."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "¿Para qué sirve desfragmentar un disco duro mecánico (HDD)?", o: ["Organizar datos dispersos para lectura más rápida.", "Borrar archivos basura.", "Aumentar espacio total.", "Instalar nuevo Windows."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "¿Cuál es la función del DNS?", o: ["Traducir nombres de dominios en direcciones IP numéricas.", "Proteger contra virus.", "Descargar anónimamente.", "Ampliar el Wi-Fi."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "Si la PC no guarda hora/fecha tras apagarse, ¿qué pieza falla?", o: ["La pila CMOS (CR2032).", "Batería principal.", "Windows.", "El cargador."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "¿Protocolo para navegar de forma segura cifrando datos?", o: ["HTTPS.", "HTTP.", "FTP.", "SMTP."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "Malware que se oculta en un programa legítimo para abrir una 'puerta trasera':", o: ["Troyano (Trojan).", "Adware.", "Spyware.", "Gusano."], c: 0 },
+        { b: "Bloque II: Mantenimiento, Redes y Ciberseguridad", q: "Ventaja de un sistema operativo de 64 bits sobre uno de 32:", o: ["Reconocer y utilizar más de 4 GB de RAM.", "Internet más rápido.", "No necesita antivirus.", "Pesa menos."], c: 0 },
+
+        // BLOQUE III - Software Educativo (31-45)
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Qué es eXeLearning?", o: ["Herramienta de autor para crear contenidos interactivos sin programar.", "Reparador de laptops remoto.", "Editor de fotos HD.", "Red social de primaria."], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Símbolo para introducir una fórmula en Excel/Sheets?", o: ["Igual (=).", "Numeral (#).", "Porcentaje (%).", "Arroba (@)."], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Extensión de archivo para paquetes SCORM interactivos?", o: [".zip", ".exe", ".mp4", ".docx"], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Función de las Tablas Dinámicas?", o: ["Resumir y analizar grandes datos de forma flexible.", "Cambiar colores automáticamente.", "Insertar imágenes.", "Impresión automática."], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "Formato para que docentes vean contenido pero no lo modifiquen:", o: [".pdf", ".txt", ".html", ".rtf"], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Para qué se utiliza Seesaw principalmente?", o: ["Como portafolio digital para que estudiantes documenten su aprendizaje.", "Como Wi-Fi comunitario.", "Para nóminas.", "Para hackear cuentas."], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Qué significa LMS?", o: ["Entorno virtual para administrar y distribuir actividades de formación.", "Limpieza de USB.", "Proyector 4K.", "Mensajería para Laptops."], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Regla del 7x7 en presentaciones?", o: ["No más de 7 líneas por diapositiva y 7 palabras por línea.", "7 imágenes por lámina.", "7 diapositivas en 7 minutos.", "7 colores y 7 fuentes."], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Función de un buscador web?", o: ["Indexar información para localizar sitios por palabras clave.", "Almacenar todos los archivos.", "Reparar internet.", "Crear páginas automáticas."], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Qué significa el campo CCO?", o: ["Enviar a varios sin que vean las direcciones de los demás.", "Prioridad máxima.", "Solo para el Director.", "Adjunto corrupto."], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Herramienta para murales colaborativos con post-its?", o: ["Padlet.", "Excel.", "Calculadora.", "Bloc de Notas."], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Qué es una 'Cookie'?", o: ["Pequeño archivo de texto para recordar preferencias e información del usuario.", "Clave Wi-Fi.", "Hardware de aceleración.", "Virus come-archivos."], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Función de WinRAR o 7-Zip?", o: ["Reducir tamaño de archivos y agruparlos.", "Video HD.", "Traductor.", "Impresión mini."], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Software para mapas mentales y conceptuales?", o: ["CmapTools.", "Audacity.", "VLC.", "Calculadora."], c: 0 },
+        { b: "Bloque III: Software Educativo y Herramientas de Autor", q: "¿Propósito de la Nube en la evaluación?", o: ["Acceso desde cualquier dispositivo y seguridad ante fallos de hardware.", "Electricidad inalámbrica.", "Predecir lluvia."], c: 0 },
+
+        // BLOQUE IV - IA (46-50)
+        { b: "Bloque IV: IA y Ciudadanía Digital", q: "En IA Generativa, ¿qué es un 'Prompt'?", o: ["Instrucción o petición específica del usuario para obtener un resultado.", "Memoria RAM de la IA.", "Virus de inteligencia.", "Cable de internet."], c: 0 },
+        { b: "Bloque IV: IA y Ciudadanía Digital", q: "¿Cuándo la IA inventa datos falsos con seguridad se llama?", o: ["Alucinación.", "Cifrado.", "Fragmentación.", "Saturación."], c: 0 },
+        { b: "Bloque IV: IA y Ciudadanía Digital", q: "¿Qué es la 'Huella Digital'?", o: ["Rastro de datos e información al navegar en internet.", "Virus de ubicación.", "Desbloqueo por dedo.", "Manchas en la PDI."], c: 0 },
+        { b: "Bloque IV: IA y Ciudadanía Digital", q: "Recomendación ética al usar IA para imágenes:", o: ["Declarar que fue generada por IA y verificar sesgos o errores.", "Cobrar a los alumnos.", "Usar colores brillantes.", "Decir que las dibujó uno."], c: 0 },
+        { b: "Bloque IV: IA y Ciudadanía Digital", q: "Competencia para distinguir entre noticia real y 'Fake News':", o: ["Pensamiento Crítico y Alfabetización Mediática.", "Instalar programas pesados.", "Velocidad de escritura.", "Espacio en el correo."], c: 0 }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let shuffledOpts = [];
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function loadNext() {
+        currentIdx++; // ESTA ES LA LÍNEA QUE HACÍA FALTA
+        if (currentIdx < banco.length) {
+            render();
+        } else {
+            finish();
+        }
+    }
+
+    function render() {
+        const data = banco[currentIdx];
+        document.getElementById('blockTag').innerText = data.b;
+        document.getElementById('qText').innerText = data.q;
+        document.getElementById('qIdx').innerText = currentIdx + 1;
+        document.getElementById('score').innerText = score;
+
+        const optionsArea = document.getElementById('options');
+        optionsArea.innerHTML = '';
+        
+        shuffledOpts = data.o.map((text, index) => ({ text, isCorrect: index === data.c }));
+        shuffle(shuffledOpts);
+
+        shuffledOpts.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => check(idx);
+            optionsArea.appendChild(btn);
+        });
+
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+        
+        const prog = (currentIdx / banco.length) * 100;
+        document.getElementById('progBar').style.width = prog + '%';
+    }
+
+    function check(idx) {
+        const btns = document.querySelectorAll('.option-btn');
+        const fb = document.getElementById('feedback');
+        btns.forEach(b => b.disabled = true);
+
+        if (shuffledOpts[idx].isCorrect) {
+            score++;
+            btns[idx].classList.add('correct');
+            fb.innerHTML = `<strong>✅ ¡Correcto!</strong>`;
+            fb.className = 'feedback correct';
+        } else {
+            btns[idx].classList.add('incorrect');
+            const cPos = shuffledOpts.findIndex(o => o.isCorrect);
+            btns[cPos].classList.add('correct');
+            fb.innerHTML = `<strong>❌ Incorrecto.</strong>`;
+            fb.className = 'feedback incorrect';
+        }
+
+        fb.style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'inline-block';
+        document.getElementById('score').innerText = score;
+    }
+
+    function finish() {
+        document.getElementById('quizArea').style.display = 'none';
+        document.getElementById('footer').style.display = 'none';
+        document.getElementById('resultArea').style.display = 'block';
+        document.getElementById('progBar').style.width = '100%';
+        document.getElementById('totalScore').innerText = score;
+        
+        const msg = document.getElementById('resultMsg');
+        const p = (score / banco.length) * 100;
+        if (p >= 90) msg.innerText = "¡Nivel de Desempeño: Excelente!";
+        else if (p >= 70) msg.innerText = "¡Nivel de Desempeño: Bueno!";
+        else msg.innerText = "Nivel: En Desarrollo. Se recomienda repasar los bloques.";
+    }
+
+    render();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP 2026: Especialista en Marco Legal y Curricular</title>
+    <style>
+        :root { --primary: #003366; --accent: #0056b3; --success: #28a745; --danger: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .quiz-container { background: white; width: 100%; max-width: 800px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: var(--primary); color: white; padding: 25px; text-align: center; border-bottom: 5px solid #ffd700; }
+        .progress-bar { height: 8px; background: #e0e0e0; width: 100%; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: 0.5s; }
+        .stats { display: flex; justify-content: space-between; padding: 12px 25px; background: #f8f9fa; font-weight: bold; border-bottom: 1px solid #ddd; }
+        .content { padding: 35px; min-height: 400px; }
+        .tag { font-size: 0.8em; text-transform: uppercase; background: #e7f0ff; color: var(--primary); padding: 5px 15px; border-radius: 20px; display: inline-block; margin-bottom: 20px; font-weight: bold; }
+        .question-text { font-size: 1.25em; font-weight: 600; color: #333; margin-bottom: 25px; line-height: 1.5; }
+        .options-list { display: grid; gap: 12px; }
+        .option-btn { text-align: left; padding: 16px; border: 2px solid #edf2f7; border-radius: 10px; background: white; cursor: pointer; transition: 0.2s; font-size: 1.05em; color: #4a5568; }
+        .option-btn:hover:not(:disabled) { border-color: var(--accent); background: #f0f7ff; }
+        .option-btn.correct { background: #d4edda !important; border-color: var(--success) !important; color: #155724; font-weight: bold; }
+        .option-btn.incorrect { background: #f8d7da !important; border-color: var(--danger) !important; color: #721c24; }
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; line-height: 1.5; border-left: 5px solid; }
+        .feedback.correct { background: #e6fffa; border-color: #38b2ac; color: #234e52; }
+        .feedback.incorrect { background: #fff5f5; border-color: #feb2b2; color: #822727; }
+        .footer { padding: 20px 35px; text-align: right; background: #f8f9fa; border-top: 1px solid #eee; }
+        .btn-next { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 6px; cursor: pointer; font-size: 1em; display: none; font-weight: bold; }
+        .result-screen { text-align: center; padding: 60px 20px; display: none; }
+        .score-circle { width: 150px; height: 150px; border-radius: 50%; border: 10px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 3em; font-weight: bold; margin: 20px auto; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <h2 style="margin:0">SIMULACRO ERP EXPERTO 2026</h2>
+        <p style="margin:5px 0 0 0; opacity: 0.9;">Marco Legal, Diseño Curricular y Gestión TIC</p>
+    </div>
+    <div class="progress-bar"><div id="progFill" class="progress-fill"></div></div>
+    <div class="stats">
+        <span>Pregunta <span id="qIdx">1</span> de 50</span>
+        <span>Puntos: <span id="score">0</span></span>
+    </div>
+
+    <div id="quizBody" class="content">
+        <div id="blockTag" class="tag"></div>
+        <div id="qText" class="question-text"></div>
+        <div id="optionsArea" class="options-list"></div>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <div id="resultArea" class="result-screen">
+        <div class="tag">Resultado Final</div>
+        <div class="score-circle" id="finalScore">0</div>
+        <p id="resultMsg" style="font-size: 1.2em; color: #4a5568;"></p>
+        <button class="btn-next" style="display:inline-block; margin-top: 20px;" onclick="location.reload()">Reiniciar Simulacro</button>
+    </div>
+
+    <div class="footer" id="quizFooter">
+        <button id="nextBtn" class="btn-next" onclick="nextQuestion()">Siguiente Pregunta</button>
+    </div>
+</div>
+
+<script>
+    const banco = [
+        { b: "Marco Legal y Diseño Curricular", q: "Según la Ley 66-97, ¿cuál es el organismo encargado de trazar las políticas generales de la educación dominicana?", o: ["El Consejo Nacional de Educación.", "La Asociación Dominicana de Profesores (ADP).", "El Viceministerio de Servicios Técnicos.", "El INAFOCAM."], c: 0, r: "El Consejo Nacional de Educación es la máxima autoridad normativa." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿Qué Ordenanza establece el proceso de adecuación curricular actual para los niveles Inicial, Primario y Secundario?", o: ["Ordenanza 04-2023.", "Ordenanza 03-2013.", "Ordenanza 01-2014.", "Ordenanza 01-96."], c: 0, r: "La 04-2023 rige la adecuación curricular vigente." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿Cómo se definen las 'Competencias Fundamentales' en el Diseño Curricular?", o: ["Competencias transversales que permiten conectar todo el currículo y expresan las intenciones educativas de mayor relevancia.", "Metas de corto plazo semanales.", "Conocimientos específicos de cada área.", "Habilidades técnicas del laboratorio."], c: 0, r: "Son transversales y esenciales para la formación integral." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿Qué Competencia Fundamental está más vinculada a la labor del Dinamizador TIC?", o: ["Competencia Científica y Tecnológica.", "Competencia Ambiental y de la Salud.", "Competencia Ética y Ciudadana.", "Competencia de Desarrollo Personal."], c: 0, r: "Es el núcleo del área de tecnología." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿Qué componente se define como 'conjunto de saberes o formas culturales'?", o: ["Los Contenidos.", "Los Indicadores de Logro.", "Las Estrategias.", "Los Recursos."], c: 0, r: "Los contenidos son los mediadores de aprendizajes significativos." },
+        { b: "Marco Legal y Diseño Curricular", q: "En el sistema de evaluación dominicano, ¿qué función tiene la 'Evaluación Diagnóstica'?", o: ["Identificar conocimientos previos, fortalezas y necesidades al inicio de un proceso.", "Sancionar estudiantes.", "Comparar resultados con otros países.", "Asignar la nota final."], c: 0, r: "Permite conocer el punto de partida del estudiante." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿Qué estrategia promueve buscar soluciones a problemas reales mediante investigación y TIC?", o: ["El Aprendizaje Basado en Proyectos (ABP).", "El Dictado.", "La Exposición Magistral.", "La Memorización."], c: 0, r: "El ABP es clave para la integración tecnológica activa." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿Qué establece la Ley 66-97 sobre la participación de la familia?", o: ["Es obligación de los padres participar y apoyar los procesos del centro.", "Es opcional.", "La familia no tiene voz ni voto.", "Solo participan los que pagan."], c: 0, r: "La familia es el primer agente educador según la ley." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿Qué son los 'Indicadores de Logro'?", o: ["Evidencias de los niveles de dominio de las competencias.", "Fotos de WhatsApp.", "Medallas de final de año.", "Reglamentos disciplinarios."], c: 0, r: "Miden el progreso real del estudiante." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿Función del Dinamizador TIC respecto a la gestión pedagógica?", o: ["Acompañar y asesorar a los docentes en el aula para la integración efectiva de las TIC.", "Sustituir maestros faltantes.", "Cobrar por el internet.", "Solo reparar computadoras."], c: 0, r: "El rol es de acompañamiento pedagógico-técnico." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿Qué establece la Constitución y la Ley 66-97 sobre la educación?", o: ["Es un derecho humano permanente e irrenunciable, gratuito y de calidad.", "Solo obligatoria para dominicanos.", "Es un privilegio de quien tiene laptop.", "Solo obligatoria la universidad."], c: 0, r: "Es un derecho fundamental garantizado por el Estado." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿Diferencia entre Estrategias y Actividades?", o: ["La estrategia es el plan general y las actividades son acciones concretas.", "Estrategias para docente, actividades para alumno.", "Son lo mismo.", "La actividad es más importante."], c: 0, r: "La estrategia engloba las actividades." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿A qué se refiere la 'Gestión del Aula'?", o: ["A la organización del tiempo, recursos, clima y procesos de aprendizaje.", "A barrer el aula.", "A pegar carteles.", "A no dejar salir al recreo."], c: 0, r: "Es la orquestación pedagógica del espacio educativo." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿Qué es la 'Metacognición'?", o: ["Proceso mediante el cual el estudiante reflexiona sobre su propio aprendizaje.", "Cuando el docente explica dos veces.", "Herramienta digital de exámenes.", "Memorizar rápido."], c: 0, r: "Es el conocimiento sobre el propio conocimiento." },
+        { b: "Marco Legal y Diseño Curricular", q: "¿Qué normativa rige el Sistema de Acompañamiento y Supervisión (SAS)?", o: ["El Manual del Sistema de Acompañamiento y Supervisión (SAS).", "El SEMMA.", "Ley de Función Pública.", "Ordenanza 01-2015."], c: 0, r: "El SAS define la supervisión técnica." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "¿Estructura básica de una Planificación de Unidad?", o: ["Situación de Aprendizaje, Competencias, Contenidos, Estrategias, Actividades, Recursos e Indicadores.", "Título y ejercicios del libro.", "Nombre del docente y examen.", "Lista de temas por mes."], c: 0, r: "Debe ser integral según la adecuación." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "Elemento indispensable en la Situación de Aprendizaje:", o: ["Problema, reto o pregunta desafiante del contexto real.", "Biografía de un científico.", "Lista de definiciones.", "Video largo."], c: 0, r: "El conflicto cognitivo motiva el aprendizaje." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "¿Normativa que establece el carácter educativo de los dispositivos?", o: ["Política de Uso de Dispositivos Tecnológicos del MINERD.", "Ley de Medio Ambiente.", "Código de Trabajo.", "Reglamento de Pensiones."], c: 0, r: "Regula el uso ético y pedagógico del hardware." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "¿Contenidos que se refieren al 'Saber Hacer'?", o: ["Procedimentales.", "Conceptuales.", "Actitudinales.", "Declarativos."], c: 0, r: "Implican acción y aplicación." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "Instrumento para registrar de forma sistemática el comportamiento ante una tarea técnica:", o: ["Registro Anecdótico o Escala de Estimación.", "Examen de selección.", "Cuaderno.", "Calificación directa."], c: 0, r: "Permiten evaluar el proceso y la conducta." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "Artículo 197 de la Ley 66-97 sobre actualización profesional:", o: ["El Estado debe organizar y sostener el perfeccionamiento docente.", "El docente no necesita estudiar más.", "El docente paga sus cursos.", "Solo para maestros nuevos."], c: 0, r: "La formación continua es una obligación estatal." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "¿Función pedagógica del Recurso Multimedia?", o: ["Facilitar comprensión de conceptos abstractos mediante diversos lenguajes.", "Sustituir al docente.", "Clase más corta.", "Mostrar modernidad."], c: 0, r: "Diversifica los canales de aprendizaje." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "¿Qué es la 'Confidencialidad de Datos'?", o: ["Proteger información personal y académica evitando divulgación no autorizada.", "Derecho del maestro a no enseñar notas.", "Fotos en Instagram personal.", "No decir nada a los padres."], c: 0, r: "Es un deber ético y legal de protección al menor." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "Estrategia de recopilación selectiva de evidencias digitales:", o: ["Portafolio Digital.", "Prueba Escrita.", "Debate.", "Inserción en Entorno."], c: 0, r: "Muestra la evolución del aprendizaje." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "Conducta ética esperada en redes sociales con estudiantes:", o: ["Mantener límites profesionales para fines pedagógicos en canales oficiales.", "Aceptar a todos como amigos íntimos.", "Bloquearlos a todos.", "Usarlas para críticas."], c: 0, r: "La profesionalidad debe primar en el entorno digital." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "¿Qué es la 'Transversalidad'?", o: ["Integración de temas de relevancia social que atraviesan todas las materias.", "Clase en el pasillo.", "Tablas cruzadas.", "Caminar de una aula a otra."], c: 0, r: "Conecta la escuela con la vida real." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "¿Qué significa 'Andamiaje' al planificar con TIC?", o: ["Apoyo temporal para lograr una tarea digital que el alumno no haría solo.", "Construir base para proyector.", "Instalar programas.", "Mueble de tablets."], c: 0, r: "Ayuda mediada que se retira progresivamente." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "Importancia de la Retroalimentación:", o: ["Identificar aciertos, errores y cómo mejorar el proceso.", "Decir cuánto sacó.", "Ruido del micrófono.", "Borrar notas."], c: 0, r: "Es el motor de la mejora del aprendizaje." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "¿Ordenanza 02-2016 sobre evaluación en Primaria?", o: ["Procesual, participativa, formativa y por competencias.", "Solo dinamizador evalúa.", "No se puede evaluar.", "Solo examen final."], c: 0, r: "Define la evaluación integral de primaria." },
+        { b: "Estrategias TIC, Planificación y Ética", q: "Primer paso si un docente pide integrar tecnología:", o: ["Revisar su planificación y sugerir herramientas alineadas pedagógicamente.", "Prestar proyector y retirarse.", "Dar la clase tú mismo.", "Decir que no pregunte."], c: 0, r: "La TIC debe servir al currículo." },
+        { b: "Metodologías, IA y Ética de la Información", q: "¿Qué caracteriza al ABP con apoyo de TIC?", o: ["Estudiantes investigan y resuelven problemas complejos reales con TIC.", "Docente da solución en diapositiva.", "Muchos ejercicios en tablet.", "Ver documental en PDI."], c: 0, r: "Protagonismo del alumno en la investigación." },
+        { b: "Metodologías, IA y Ética de la Información", q: "Ventaja de la 'Gamificación':", o: ["Aumentar motivación y compromiso hacia tareas áridas.", "Silencio en el aula.", "Sustituir notas.", "Ahorrar tiempo."], c: 0, r: "Usa el juego como motor de aprendizaje." },
+        { b: "Metodologías, IA y Ética de la Información", q: "Principio de 'Supervisión Humana' en IA:", o: ["Validar y corregir siempre el contenido generado para evitar sesgos/errores.", "Copiar y pegar.", "Prohibir IA.", "Calificación automática sin revisión."], c: 0, r: "El docente es el garante de la veracidad." },
+        { b: "Metodologías, IA y Ética de la Información", q: "Romper problema grande en partes pequeñas se llama:", o: ["Descomposición.", "Abstracción.", "Algoritmos.", "Patrones."], c: 0, r: "Pilar del Pensamiento Computacional." },
+        { b: "Metodologías, IA y Ética de la Información", q: "¿Qué constituye un 'Plagio'?", o: ["Presentar ideas ajenas como propias sin dar crédito.", "Citar al autor.", "Software libre.", "Compartir YouTube."], c: 0, r: "Falta grave de honestidad académica." },
+        { b: "Metodologías, IA y Ética de la Información", q: "¿Qué es la 'Alfabetización Mediática'?", o: ["Capacidad de analizar críticamente mensajes y distinguir desinformación.", "Reparar radios.", "Redes sociales personales.", "Instalar editores de video."], c: 0, r: "Protege contra las noticias falsas." },
+        { b: "Metodologías, IA y Ética de la Información", q: "¿Qué fomenta la 'Indagación Dialógica' en foros?", o: ["Intercambio de ideas y construcción de argumentos.", "Memorización.", "Velocidad de teclado.", "Uso individual."], c: 0, r: "Construcción colectiva del saber." },
+        { b: "Metodologías, IA y Ética de la Información", q: "¿Uso de 'Recursos del Medio' en tecnología?", o: ["Aprovechar cualquier recurso del entorno para aprendizajes significativos.", "Solo usar lo que da el MINERD.", "Solo en ciencias.", "Sin PC no se enseña."], c: 0, r: "El contexto es un recurso didáctico." },
+        { b: "Metodologías, IA y Ética de la Información", q: "¿Para qué sirve la Rúbrica?", o: ["Establecer criterios claros y niveles de desempeño.", "Nota del 1 al 10.", "Asistencia.", "Firmar documentos."], c: 0, r: "Guía el aprendizaje y la evaluación." },
+        { b: "Metodologías, IA y Ética de la Información", q: "¿Qué es la Propiedad Intelectual?", o: ["Derecho legal que protege creaciones de la mente.", "Derecho a laptops viejas.", "Tasa de Google.", "Espacio del servidor."], c: 0, r: "Respeto a las licencias y autores." },
+        { b: "Metodologías, IA y Ética de la Información", q: "Función de 'Prompts' efectivos:", o: ["Instrucciones claras para resultados precisos de IA.", "Código secreto maestros.", "Velocidad de red.", "Nombre de cable."], c: 0, r: "Mejor entrada = Mejor salida pedagógica." },
+        { b: "Metodologías, IA y Ética de la Información", q: "¿Qué es el derecho a la desconexión?", o: ["Derecho a no estar conectado fuera de horario para salud mental.", "Apagar router sin luz.", "Falta de pago internet.", "Desenchufar PDI en lluvia."], c: 0, r: "Equilibrio vida-trabajo digital." },
+        { b: "Metodologías, IA y Ética de la Información", q: "¿Componente de valores y actitudes al usar TIC?", o: ["Contenidos Actitudinales.", "Indicadores.", "Conceptuales.", "Procedimentales."], c: 0, r: "Se enfoca en el comportamiento ético." },
+        { b: "Metodologías, IA y Ética de la Información", q: "¿Qué es promover 'Software Libre'?", o: ["Programas que respetan libertad de usar, estudiar y mejorar.", "Software sin costo siempre.", "Software pirata.", "PC sin clave."], c: 0, r: "Fomenta la soberanía tecnológica." },
+        { b: "Metodologías, IA y Ética de la Información", q: "¿Qué es la 'Brecha Cognitiva'?", o: ["Diferencia en capacidad de transformar información en conocimiento.", "Falta de fibra óptica.", "Olvidar clave Moodle.", "Precio de laptop."], c: 0, r: "No es acceso, es comprensión." },
+        { b: "Liderazgo, Gestión y Evaluación de Impacto", q: "¿Responsabilidad principal en el POA?", o: ["Alinear integración TIC y mantenimiento con metas pedagógicas.", "Presupuesto para café.", "Hacer trabajo de otros.", "Dar laptops a amigos."], c: 0, r: "La tecnología debe apoyar el plan del centro." },
+        { b: "Liderazgo, Gestión y Evaluación de Impacto", q: "¿Cómo actuar ante conflicto por carrito de laptops?", o: ["Mediar según calendario previo y organizar tiempos.", "Quedarse el equipo.", "Dar al que llegó primero.", "Cerrar laboratorio."], c: 0, r: "La planificación evita conflictos." },
+        { b: "Liderazgo, Gestión y Evaluación de Impacto", q: "¿Cómo medir efectividad de proyectos TIC?", o: ["Análisis de indicadores logrados y calidad de productos finales.", "Horas frente pantalla.", "Que no se rompió nada.", "Fotos bonitas."], c: 0, r: "El fin es el aprendizaje, no el uso." },
+        { b: "Liderazgo, Gestión y Evaluación de Impacto", q: "¿Qué es un 'Plan de Continuidad Pedagógica'?", o: ["Estrategia de alternativas didácticas offline si falla la TIC.", "Teléfonos de técnicos.", "Manual de tablets.", "Arreglar servidor rápido."], c: 0, r: "Garantiza que la clase siga." },
+        { b: "Liderazgo, Gestión y Evaluación de Impacto", q: "¿Objetivo de 'Sistematización de Buenas Prácticas'?", o: ["Documentar experiencias exitosas para replicar y mejorar.", "Requisito de papeleo.", "Lista de errores.", "Presumir ante otros."], c: 0, r: "Aprender de lo que funciona." }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let shuffledOpts = [];
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function render() {
+        const data = banco[current];
+        document.getElementById('blockTag').innerText = data.b;
+        document.getElementById('qText').innerText = data.q;
+        document.getElementById('qIdx').innerText = current + 1;
+        document.getElementById('score').innerText = score;
+
+        const optionsArea = document.getElementById('optionsArea');
+        optionsArea.innerHTML = '';
+        
+        shuffledOpts = data.o.map((text, index) => ({ text, isCorrect: index === data.c }));
+        shuffle(shuffledOpts);
+
+        shuffledOpts.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => select(idx);
+            optionsArea.appendChild(btn);
+        });
+
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+        
+        const prog = (current / banco.length) * 100;
+        document.getElementById('progFill').style.width = prog + '%';
+    }
+
+    function select(idx) {
+        const btns = document.querySelectorAll('.option-btn');
+        const feedback = document.getElementById('feedback');
+        btns.forEach(b => b.disabled = true);
+
+        if (shuffledOpts[idx].isCorrect) {
+            score++;
+            btns[idx].classList.add('correct');
+            feedback.innerHTML = `<strong>✅ CORRECTO:</strong> ${banco[current].r}`;
+            feedback.className = 'feedback correct';
+        } else {
+            btns[idx].classList.add('incorrect');
+            const cPos = shuffledOpts.findIndex(o => o.isCorrect);
+            btns[cPos].classList.add('correct');
+            feedback.innerHTML = `<strong>❌ INCORRECTO:</strong> ${banco[current].r}`;
+            feedback.className = 'feedback incorrect';
+        }
+
+        feedback.style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'inline-block';
+        document.getElementById('score').innerText = score;
+    }
+
+    function nextQuestion() {
+        current++; // Incrementamos el valor para la siguiente pregunta
+        if (current < banco.length) {
+            render();
+        } else {
+            finish();
+        }
+    }
+
+    function finish() {
+        document.getElementById('quizBody').style.display = 'none';
+        document.getElementById('quizFooter').style.display = 'none';
+        document.getElementById('resultArea').style.display = 'block';
+        document.getElementById('progFill').style.width = '100%';
+        document.getElementById('totalScore').innerText = score;
+        
+        const msg = document.getElementById('resultMsg');
+        const p = (score / banco.length) * 100;
+        if (p >= 90) msg.innerText = "¡Nivel Excelente! Eres un Dinamizador con dominio total del marco legal y curricular.";
+        else if (p >= 75) msg.innerText = "¡Nivel Muy Bueno! Conoces bien las normativas, repasa los detalles técnicos de gestión.";
+        else msg.innerText = "Nivel Mejorable. Te recomendamos repasar la Ley 66-97 y la nueva Adecuación Curricular.";
+    }
+
+    render();
+</script>
+
+</body>
+</html>
