@@ -3,512 +3,563 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulacro ERP de Alta Exigencia — Dinamizador TIC</title>
+  <title>Simulacro ERP — Dinamizador TIC</title>
   <style>
     :root {
-      --primary: #102a43;
-      --secondary: #1f4e79;
-      --accent: #1f7a4d;
-      --danger: #b42318;
-      --warning: #b7791f;
-      --bg: #f4f7fb;
-      --card: #ffffff;
-      --muted: #64748b;
-      --border: #d9e2ec;
-      --shadow: 0 10px 30px rgba(15, 23, 42, .10);
-      --radius: 18px;
+      --moodle-blue: #0f6cbf;
+      --moodle-dark: #343a40;
+      --moodle-border: #d7dfe7;
+      --moodle-bg: #f8f9fa;
+      --moodle-card: #ffffff;
+      --moodle-gray: #6a737b;
+      --moodle-success: #198754;
+      --moodle-warning: #f0ad4e;
+      --moodle-danger: #dc3545;
+      --moodle-light-blue: #e7f1fb;
+      --moodle-selected: #d9edf7;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: linear-gradient(180deg, #eef4fb, #f8fafc);
-      color: #172033;
-      line-height: 1.55;
+      background: var(--moodle-bg);
+      color: #1f2933;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
     }
 
-    header {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      padding: 22px 18px;
-      box-shadow: var(--shadow);
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--moodle-border);
+      padding: 10px 18px;
       position: sticky;
       top: 0;
-      z-index: 20;
+      z-index: 30;
     }
 
-    .header-inner {
+    .topbar-inner {
       max-width: 1180px;
-      margin: 0 auto;
-    }
-
-    .title-row {
+      margin: auto;
       display: flex;
-      flex-wrap: wrap;
+      align-items: center;
       justify-content: space-between;
       gap: 16px;
-      align-items: center;
+      flex-wrap: wrap;
     }
 
-    h1 {
-      font-size: clamp(1.2rem, 2.2vw, 1.85rem);
-      margin: 0;
-      letter-spacing: .2px;
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    .subtitle {
-      margin: 6px 0 0;
-      font-size: .95rem;
-      opacity: .92;
+    .brand-title {
+      color: var(--moodle-blue);
+      font-weight: 700;
+      font-size: 1.08rem;
+    }
+
+    .brand-subtitle {
+      color: var(--moodle-gray);
+      font-size: .88rem;
     }
 
     .timer {
-      background: rgba(255,255,255,.12);
-      border: 1px solid rgba(255,255,255,.35);
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 1.05rem;
-      min-width: 164px;
+      background: #fff3cd;
+      color: #6f4e00;
+      border: 1px solid #ffe69c;
+      border-radius: 4px;
+      padding: 7px 11px;
+      font-weight: 700;
+      min-width: 138px;
       text-align: center;
     }
 
     .timer.danger {
-      background: rgba(180, 35, 24, .22);
-      border-color: rgba(255,255,255,.55);
+      background: #f8d7da;
+      color: #842029;
+      border-color: #f5c2c7;
     }
 
-    .progress-panel {
+    .page {
       max-width: 1180px;
-      margin: 14px auto 0;
+      margin: 18px auto 34px;
+      padding: 0 14px;
       display: grid;
-      grid-template-columns: repeat(20, 1fr);
-      gap: 6px;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 18px;
+      align-items: start;
     }
 
-    .qbox {
-      height: 26px;
-      border-radius: 7px;
-      border: 1px solid rgba(255,255,255,.42);
-      color: white;
-      background: rgba(255,255,255,.16);
-      font-size: .72rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      user-select: none;
+    .maincol {
+      min-width: 0;
+    }
+
+    .block, .quiz-card {
+      background: var(--moodle-card);
+      border: 1px solid var(--moodle-border);
+      border-radius: 4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+
+    .block-header {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--moodle-border);
       font-weight: 700;
+      color: #27313a;
+      background: #fff;
     }
 
-    .qbox.answered {
-      background: #22c55e;
-      color: #052e16;
-      border-color: #bbf7d0;
+    .block-body {
+      padding: 12px;
     }
 
-    .qbox.current {
-      outline: 3px solid #facc15;
-      outline-offset: 1px;
+    .quiz-card {
+      padding: 0;
     }
 
-    main {
-      max-width: 980px;
-      margin: 26px auto;
-      padding: 0 16px 40px;
+    .quiz-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--moodle-border);
+      background: #fff;
     }
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: clamp(18px, 3vw, 30px);
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.45rem;
+      color: #1f2933;
+      font-weight: 500;
     }
 
-    .intro-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
+    h2 {
+      font-size: 1.22rem;
+      font-weight: 500;
+      margin-top: 0;
+    }
+
+    .muted {
+      color: var(--moodle-gray);
+      font-size: .94rem;
+    }
+
+    .intro {
+      padding: 18px;
     }
 
     .notice {
-      background: #eef6ff;
-      border-left: 5px solid var(--secondary);
-      padding: 14px 16px;
-      border-radius: 12px;
-      color: #12365a;
+      background: #f5f9fd;
+      border: 1px solid #cfe2f3;
+      border-left: 4px solid var(--moodle-blue);
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 4px;
     }
 
     .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 10px;
+      margin: 14px 0;
     }
 
     label {
+      display: block;
       font-weight: 700;
+      margin-bottom: 5px;
     }
 
     input[type="text"] {
       width: 100%;
-      max-width: 520px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
+      max-width: 470px;
+      padding: 9px 10px;
+      border: 1px solid #b8c2cc;
+      border-radius: 4px;
       font-size: 1rem;
     }
 
-    .question-head {
+    .question-wrap {
+      padding: 18px;
+    }
+
+    .question-meta {
       display: flex;
       justify-content: space-between;
-      gap: 14px;
+      gap: 10px;
       flex-wrap: wrap;
       align-items: center;
+      border-bottom: 1px solid var(--moodle-border);
+      padding-bottom: 10px;
       margin-bottom: 14px;
     }
 
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #e6f0fa;
-      color: #143f68;
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-weight: 800;
-      font-size: .92rem;
+    .qnum {
+      font-weight: 700;
+      color: #27313a;
     }
 
-    .score-pill {
-      background: #ecfdf3;
-      color: #05603a;
+    .status {
+      font-size: .9rem;
+      color: var(--moodle-gray);
+    }
+
+    .status.answered {
+      color: var(--moodle-success);
+      font-weight: 700;
     }
 
     .question-text {
-      font-size: 1.08rem;
-      font-weight: 650;
-      margin: 10px 0 20px;
+      margin: 15px 0 18px;
+      font-size: 1.03rem;
     }
 
-    .options {
+    .answer-list {
       display: grid;
-      gap: 12px;
-      margin: 18px 0;
+      gap: 8px;
+      margin-top: 14px;
     }
 
-    .option {
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 14px;
-      cursor: pointer;
+    .answer {
       display: grid;
-      grid-template-columns: 36px 1fr;
-      gap: 10px;
+      grid-template-columns: 26px 1fr;
       align-items: start;
-      transition: .18s ease;
-      background: white;
+      gap: 9px;
+      padding: 10px 9px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
     }
 
-    .option:hover {
-      border-color: #8ab4dc;
-      transform: translateY(-1px);
+    .answer:hover {
+      background: #f2f7fb;
+      border-color: #cfe2f3;
     }
 
-    .option.selected {
-      border-color: var(--secondary);
-      background: #eef6ff;
+    .answer.selected {
+      background: var(--moodle-selected);
+      border-color: #9ec5df;
     }
 
-    .option.correct {
-      border-color: #16a34a;
-      background: #ecfdf3;
+    .answer input {
+      margin-top: 4px;
+      transform: scale(1.05);
+      cursor: pointer;
     }
 
-    .option.incorrect {
-      border-color: #dc2626;
-      background: #fff1f2;
+    .answer.review-correct {
+      border-color: #badbcc;
+      background: #d1e7dd;
     }
 
-    .letter {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: #e2e8f0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      color: #1e293b;
+    .answer.review-wrong {
+      border-color: #f5c2c7;
+      background: #f8d7da;
     }
 
-    .option.correct .letter {
-      background: #16a34a;
-      color: white;
-    }
-
-    .option.incorrect .letter {
-      background: #dc2626;
-      color: white;
-    }
-
-    .option.disabled {
-      cursor: not-allowed;
-    }
-
-    .feedback {
-      display: none;
-      margin-top: 16px;
-      border-radius: 14px;
-      padding: 14px 16px;
-      border: 1px solid;
-      font-weight: 600;
-    }
-
-    .feedback.good {
-      display: block;
-      border-color: #86efac;
-      background: #f0fdf4;
-      color: #166534;
-    }
-
-    .feedback.bad {
-      display: block;
-      border-color: #fecaca;
-      background: #fff1f2;
-      color: #991b1b;
-    }
-
-    .nav {
+    .nav-buttons {
+      padding: 14px 18px;
+      border-top: 1px solid var(--moodle-border);
       display: flex;
       justify-content: space-between;
+      gap: 10px;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 22px;
+      background: #fff;
     }
 
     button {
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 18px;
-      font-weight: 800;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 8px 13px;
+      font-size: .95rem;
       cursor: pointer;
-      font-size: .98rem;
-      transition: .18s ease;
-    }
-
-    button:hover { transform: translateY(-1px); }
-    button:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-      transform: none;
+      font-weight: 500;
     }
 
     .btn-primary {
-      background: var(--secondary);
-      color: white;
+      background: var(--moodle-blue);
+      color: #fff;
+      border-color: var(--moodle-blue);
     }
 
-    .btn-success {
-      background: var(--accent);
-      color: white;
-    }
-
-    .btn-warning {
-      background: var(--warning);
-      color: white;
+    .btn-secondary {
+      background: #6c757d;
+      color: #fff;
+      border-color: #6c757d;
     }
 
     .btn-light {
-      background: #e2e8f0;
-      color: #1e293b;
+      background: #fff;
+      color: #1f2933;
+      border-color: #c7d0d9;
     }
 
     .btn-danger {
-      background: var(--danger);
-      color: white;
+      background: var(--moodle-danger);
+      color: #fff;
+      border-color: var(--moodle-danger);
     }
 
-    .result-score {
-      text-align: center;
-      padding: 18px;
-      border-radius: 18px;
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      margin: 20px 0;
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
     }
 
-    .big-score {
-      font-size: clamp(2.4rem, 8vw, 4rem);
-      color: var(--primary);
-      margin: 0;
-      font-weight: 900;
-    }
-
-    .result-grid {
+    .nav-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .nav-item {
+      min-height: 32px;
+      border: 1px solid #b8c2cc;
+      background: #fff;
+      color: #1f2933;
+      border-radius: 3px;
+      font-size: .85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      font-weight: 600;
+    }
+
+    .nav-item.answered {
+      background: #d1e7dd;
+      border-color: #8ec3a7;
+      color: #0f5132;
+    }
+
+    .nav-item.current {
+      outline: 2px solid var(--moodle-blue);
+      outline-offset: 1px;
+    }
+
+    .legend {
+      display: grid;
+      gap: 7px;
+      font-size: .88rem;
+      margin-top: 12px;
+      color: #4b5563;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .sq {
+      width: 15px;
+      height: 15px;
+      border: 1px solid #b8c2cc;
+      display: inline-block;
+      border-radius: 2px;
+      background: #fff;
+    }
+
+    .sq.green {
+      background: #d1e7dd;
+      border-color: #8ec3a7;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
       gap: 12px;
-      margin: 18px 0;
+      margin: 16px 0;
     }
 
     .stat {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
+      border: 1px solid var(--moodle-border);
+      background: #fff;
+      border-radius: 4px;
+      padding: 12px;
     }
 
     .stat strong {
       display: block;
-      font-size: 1.5rem;
-      color: var(--secondary);
+      font-size: 1.45rem;
+      color: var(--moodle-blue);
+    }
+
+    .score-big {
+      font-size: 2.8rem;
+      margin: 8px 0;
+      color: #1f2933;
+      font-weight: 700;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 18px;
+      margin-top: 14px;
+      background: #fff;
       font-size: .92rem;
     }
 
     th, td {
-      border-bottom: 1px solid var(--border);
-      padding: 10px 8px;
-      text-align: left;
+      border: 1px solid var(--moodle-border);
+      padding: 8px;
       vertical-align: top;
+      text-align: left;
     }
 
     th {
-      background: #f1f5f9;
-      color: #0f172a;
+      background: #f1f3f5;
+      font-weight: 700;
     }
 
-    .ok { color: #15803d; font-weight: 800; }
-    .fail { color: #b91c1c; font-weight: 800; }
+    .ok {
+      color: #0f5132;
+      font-weight: 700;
+    }
 
-    .hidden { display: none !important; }
+    .bad {
+      color: #842029;
+      font-weight: 700;
+    }
 
-    @media (max-width: 700px) {
-      .progress-panel {
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        grid-template-columns: 1fr;
+      }
+      .sidecol {
+        order: -1;
+      }
+      .nav-grid {
         grid-template-columns: repeat(10, 1fr);
       }
-      .qbox {
-        height: 24px;
-        font-size: .68rem;
-      }
-      .option {
-        grid-template-columns: 32px 1fr;
-      }
     }
 
-    @media print {
-      header, .nav, .no-print { display: none !important; }
-      body { background: white; }
-      main { max-width: none; }
-      .card { box-shadow: none; border: none; }
+    @media (max-width: 520px) {
+      .nav-grid {
+        grid-template-columns: repeat(8, 1fr);
+      }
+      .answer {
+        grid-template-columns: 24px 1fr;
+      }
+      .score-big {
+        font-size: 2.25rem;
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="header-inner">
-      <div class="title-row">
-        <div>
-          <h1>Simulacro ERP de Alta Exigencia — Dinamizador TIC</h1>
-          <p class="subtitle">40 ítems de casos profesionales · Valor total: 50 puntos · 1.25 puntos por ítem</p>
-        </div>
-        <div id="timer" class="timer">60:00</div>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-title">Simulacro ERP — Dinamizador TIC</div>
+        <div class="brand-subtitle">40 ítems de casos · Valor: 50 puntos · Tiempo límite: 60 minutos</div>
       </div>
-      <div id="progressPanel" class="progress-panel" aria-label="Panel de progreso"></div>
+      <div id="timer" class="timer">Tiempo restante: 60:00</div>
     </div>
-  </header>
+  </div>
 
-  <main>
-    <section id="startScreen" class="card">
-      <div class="intro-grid">
-        <h2>Prueba de práctica ERP</h2>
-        <div class="notice">
-          <strong>Tiempo:</strong> 60 minutos. Una pregunta por pantalla. Al confirmar una respuesta recibirás retroalimentación inmediata y la respuesta quedará bloqueada.
+  <div class="page">
+    <main class="maincol">
+      <section id="startScreen" class="quiz-card">
+        <div class="quiz-header">
+          <h1>Simulacro ERP de Alta Exigencia</h1>
+          <div class="muted">Ejercicio de Rendimiento Profesional — Cargo: Dinamizador TIC</div>
         </div>
-        <p>
-          Este simulacro está diseñado para practicar toma de decisiones profesionales como Dinamizador TIC:
-          integración pedagógica, acompañamiento docente, soporte básico, seguridad digital, protección de datos,
-          inclusión, gestión de recursos y evidencias institucionales.
-        </p>
-        <div class="field">
-          <label for="candidateName">Nombre del participante</label>
-          <input id="candidateName" type="text" placeholder="Escribe tu nombre" />
+        <div class="intro">
+          <div class="notice">
+            <strong>Indicaciones:</strong> Selecciona una respuesta por pregunta. Puedes avanzar y retroceder libremente. No recibirás retroalimentación durante la prueba. El puntaje y las respuestas correctas se mostrarán solo al finalizar.
+          </div>
+          <p>Esta prueba simula una experiencia tipo Moodle: una pregunta por página, panel de navegación, temporizador y envío final.</p>
+          <p><strong>Tiempo:</strong> 60 minutos. <strong>Valor:</strong> 50 puntos. <strong>Cada ítem:</strong> 1.25 puntos.</p>
+          <div class="field">
+            <label for="candidateName">Nombre del participante</label>
+            <input id="candidateName" type="text" placeholder="Escribe tu nombre" />
+          </div>
+          <button class="btn-primary" onclick="startExam()">Comenzar intento</button>
         </div>
-        <div class="nav">
-          <button class="btn-primary" onclick="startExam()">Iniciar prueba</button>
+      </section>
+
+      <section id="quizScreen" class="quiz-card hidden">
+        <div class="quiz-header">
+          <h1>Pregunta <span id="currentNumber">1</span></h1>
+          <div id="questionStatus" class="status">Sin responder</div>
+        </div>
+        <div class="question-wrap">
+          <div class="question-meta">
+            <div class="qnum" id="questionCounter">Pregunta 1 de 40</div>
+            <div class="muted">Seleccione una respuesta.</div>
+          </div>
+          <div id="questionText" class="question-text"></div>
+          <div id="answerList" class="answer-list"></div>
+        </div>
+        <div class="nav-buttons">
+          <button id="prevBtn" class="btn-light" onclick="goPrev()">Página anterior</button>
+          <div>
+            <button id="nextBtn" class="btn-primary" onclick="goNext()">Siguiente página</button>
+            <button class="btn-danger" onclick="finishExam(false)">Enviar todo y terminar</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="resultScreen" class="quiz-card hidden">
+        <div class="quiz-header">
+          <h1>Resumen del intento</h1>
+          <div class="muted" id="resultName">Participante</div>
+        </div>
+        <div class="intro">
+          <p class="score-big" id="scoreText">0/50</p>
+          <p id="verdict"></p>
+
+          <div class="summary-grid">
+            <div class="stat">Correctas <strong id="correctCount">0</strong></div>
+            <div class="stat">Incorrectas <strong id="wrongCount">0</strong></div>
+            <div class="stat">Sin responder <strong id="blankCount">0</strong></div>
+            <div class="stat">Porcentaje <strong id="percentScore">0%</strong></div>
+          </div>
+
+          <h2>Retroalimentación general</h2>
+          <p id="generalFeedback"></p>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin: 18px 0;">
+            <button class="btn-primary" onclick="reviewExam()">Revisar intento</button>
+            <button class="btn-light" onclick="window.print()">Imprimir resultados</button>
+            <button class="btn-secondary" onclick="resetExam()">Reiniciar intento</button>
+          </div>
+
+          <h2>Detalle de respuestas</h2>
+          <div style="overflow-x:auto;">
+            <table id="resultTable">
+              <thead>
+                <tr>
+                  <th>Pregunta</th>
+                  <th>Respuesta dada</th>
+                  <th>Respuesta correcta</th>
+                  <th>Resultado</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="sidecol">
+      <div class="block">
+        <div class="block-header">Navegación del cuestionario</div>
+        <div class="block-body">
+          <div id="navGrid" class="nav-grid"></div>
+          <div class="legend">
+            <span><i class="sq"></i> Sin responder</span>
+            <span><i class="sq green"></i> Respondida</span>
+          </div>
+          <hr style="border:0; border-top:1px solid #d7dfe7; margin:12px 0;">
+          <div class="muted" id="answeredInfo">Respondidas: 0/40</div>
         </div>
       </div>
-    </section>
-
-    <section id="quizScreen" class="card hidden">
-      <div class="question-head">
-        <span class="pill" id="questionCounter">Pregunta 1 de 40</span>
-        <span class="pill score-pill" id="answeredCounter">Respondidas: 0/40</span>
-      </div>
-
-      <div id="questionText" class="question-text"></div>
-      <div id="options" class="options"></div>
-      <div id="feedback" class="feedback"></div>
-
-      <div class="nav">
-        <button id="prevBtn" class="btn-light" onclick="goPrev()">Anterior</button>
-        <div>
-          <button id="confirmBtn" class="btn-success" onclick="confirmAnswer()">Confirmar respuesta</button>
-          <button id="nextBtn" class="btn-primary" onclick="goNext()">Siguiente</button>
-          <button id="finishBtn" class="btn-danger" onclick="finishExam(false)">Finalizar prueba</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="resultScreen" class="card hidden">
-      <h2>Resultados del simulacro</h2>
-      <div class="result-score">
-        <p id="resultName"></p>
-        <p class="big-score" id="scoreOutOf50">0/50</p>
-        <p id="verdict"></p>
-      </div>
-
-      <div class="result-grid">
-        <div class="stat">Correctas <strong id="correctCount">0</strong></div>
-        <div class="stat">Incorrectas <strong id="wrongCount">0</strong></div>
-        <div class="stat">Sin responder <strong id="blankCount">0</strong></div>
-        <div class="stat">Porcentaje <strong id="percentScore">0%</strong></div>
-      </div>
-
-      <h3>Retroalimentación general</h3>
-      <p id="generalFeedback"></p>
-
-      <div class="nav no-print">
-        <button class="btn-light" onclick="window.print()">Imprimir resultados</button>
-        <button class="btn-primary" onclick="reviewExam()">Revisar preguntas</button>
-        <button class="btn-warning" onclick="resetExam()">Reiniciar simulacro</button>
-      </div>
-
-      <h3>Detalle por pregunta</h3>
-      <div style="overflow-x:auto;">
-        <table id="resultTable">
-          <thead>
-            <tr>
-              <th>Pregunta</th>
-              <th>Tu respuesta</th>
-              <th>Correcta</th>
-              <th>Resultado</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+    </aside>
+  </div>
 
   <script>
     const QUESTIONS = [
@@ -516,454 +567,454 @@
     "n": 1,
     "text": "Durante una observación de aula, una docente utiliza una plataforma de cuestionarios digitales. Los estudiantes participan con entusiasmo, pero al revisar la clase se evidencia que las preguntas solo miden memorización literal y no se corresponden claramente con los indicadores trabajados en la planificación. La docente considera que la actividad fue exitosa porque “todos participaron”. ¿Cuál sería la retroalimentación más adecuada del Dinamizador TIC?",
     "options": {
-      "A": "Reconocer la motivación generada y sugerir que aumente la cantidad de preguntas para cubrir más contenido en futuras clases.",
-      "B": "Indicar que la herramienta es pertinente, pero recomendar que se aplique solo al final de la unidad para evitar interrumpir la enseñanza.",
+      "A": "Reconocer la motivación lograda y sugerir que conserve la herramienta, incorporando algunas preguntas abiertas para ampliar la participación en próximas clases.",
+      "B": "Indicar que la actividad fue válida como estrategia inicial, pero recomendar que los resultados se usen solo como diagnóstico complementario y no como evidencia principal.",
       "C": "Valorar la participación, pero orientar la revisión de los ítems para alinearlos con indicadores, niveles de pensamiento, retroalimentación y uso formativo de los resultados.",
-      "D": "Proponer sustituir la plataforma por una prueba escrita, porque la motivación estudiantil puede ocultar debilidades reales de aprendizaje."
+      "D": "Proponer que combine la plataforma con una prueba escrita posterior, de modo que la motivación digital no sea el único criterio para valorar el aprendizaje."
     },
     "answer": "C",
-    "feedback": "La mejor actuación reconoce la motivación, pero centra la mejora en alineación curricular, evaluación formativa y uso de evidencias."
+    "feedback": "La clave está en no quedarse en la motivación: la herramienta debe alinearse con indicadores, generar evidencia y servir para retroalimentar."
   },
   {
     "n": 2,
     "text": "La dirección solicita al Dinamizador TIC priorizar el préstamo de equipos para la semana. Hay cuatro solicitudes: una exposición con diapositivas decorativas, una evaluación formativa con análisis de resultados, una actividad de video sin guía de trabajo y una clase con simulación digital previamente planificada. Solo hay un proyector disponible. ¿Cuál criterio debe orientar la decisión?",
     "options": {
       "A": "Priorizar las actividades con mayor justificación pedagógica, planificación previa, impacto en el aprendizaje y posibilidad de generar evidencias útiles.",
-      "B": "Asignar el proyector por orden de solicitud, porque es el criterio administrativo más neutral y evita conflictos.",
-      "C": "Dar prioridad a la actividad con mayor cantidad de estudiantes beneficiados, aunque su propósito pedagógico sea menos claro.",
-      "D": "Consultar a la dirección cuál docente debe recibir el equipo, para no asumir una decisión que puede generar inconformidad."
+      "B": "Asignar el proyector por orden de solicitud, pero pedir a los demás docentes que reformulen sus actividades para futuras reservas.",
+      "C": "Dar prioridad a la actividad que involucre más estudiantes, siempre que el docente acepte entregar una evidencia breve al finalizar.",
+      "D": "Coordinar con dirección una decisión conjunta, usando como referencia el orden de solicitud, el tipo de actividad y la disponibilidad del docente."
     },
     "answer": "A",
-    "feedback": "El recurso debe asignarse con criterios pedagógicos, equidad, planificación e impacto, no solo por orden o conveniencia."
+    "feedback": "El criterio más profesional es pedagógico e institucional: propósito, planificación, impacto, evidencias y equidad."
   },
   {
     "n": 3,
     "text": "Un docente pide apoyo para usar inteligencia artificial generativa en la elaboración de planificaciones. Presenta una planificación aparentemente bien redactada, pero con actividades poco contextualizadas, indicadores imprecisos y estrategias que no se ajustan al nivel de sus estudiantes. ¿Cuál debe ser la orientación del Dinamizador TIC?",
     "options": {
-      "A": "Recomendar que use la planificación como base, porque la estructura formal está completa y puede ajustarse durante la clase.",
-      "B": "Sugerir que cambie el texto para que no parezca generado por IA, cuidando que tenga un estilo más personal.",
-      "C": "Desaconsejar el uso de IA en planificación, porque puede producir actividades no alineadas al currículo.",
+      "A": "Recomendar que utilice la planificación como borrador operativo, siempre que durante la clase ajuste las actividades según las reacciones del grupo.",
+      "B": "Sugerir que revise el lenguaje del documento, agregue ejemplos del contexto del centro y evite depender de respuestas generadas automáticamente.",
+      "C": "Desaconsejar el uso de IA para planificaciones evaluables, porque la herramienta puede producir textos formales sin alineación curricular suficiente.",
       "D": "Orientar que la IA puede apoyar, pero el docente debe revisar, contextualizar, alinear al currículo, validar pertinencia y asumir responsabilidad profesional sobre lo que implementa."
     },
     "answer": "D",
-    "feedback": "La IA puede apoyar, pero la responsabilidad profesional, contextualización curricular y validación pedagógica siguen siendo del docente."
+    "feedback": "La IA puede apoyar, pero no sustituye el juicio docente ni la responsabilidad curricular y pedagógica."
   },
   {
     "n": 4,
     "text": "En el Espacio TIC, varios estudiantes trabajan en equipos colaborativos. Un grupo tiene un estudiante con bajo dominio lector, por lo que sus compañeros le asignan únicamente decorar la presentación. El docente dice que “al menos está participando”. ¿Qué debe sugerir el Dinamizador TIC?",
     "options": {
-      "A": "Mantener la asignación si el estudiante se siente cómodo, porque la inclusión también implica respetar sus intereses y evitar frustración.",
+      "A": "Mantener el rol decorativo si se complementa con una pregunta oral breve al final, para comprobar que el estudiante comprendió el tema.",
       "B": "Rediseñar roles para que el estudiante participe en una tarea cognitiva alcanzable, con apoyo, andamiaje, recursos visuales y evidencia de comprensión.",
-      "C": "Separar al estudiante para que realice una actividad más sencilla, adaptada a su nivel, sin afectar el avance del grupo.",
-      "D": "Pedir al grupo que le permita leer una parte breve durante la exposición, aunque no haya participado en el análisis."
+      "C": "Asignarle una tarea digital distinta con menor carga lectora, de modo que pueda trabajar a su ritmo sin limitar al equipo.",
+      "D": "Pedir al grupo que alterne la lectura y el diseño, asegurando que todos aparezcan en la presentación final como participantes."
     },
     "answer": "B",
-    "feedback": "La inclusión real no es participación decorativa; requiere acceso al propósito cognitivo con apoyos razonables."
+    "feedback": "La inclusión exige participación cognitiva real, no solo una tarea periférica o decorativa."
   },
   {
     "n": 5,
     "text": "Una docente quiere crear un grupo de mensajería con estudiantes para enviar recursos y recordatorios. Argumenta que es más rápido que Classroom y que las familias ya usan esa aplicación. Algunos estudiantes son menores y no todos tienen autorización clara. ¿Cuál orientación es más adecuada?",
     "options": {
-      "A": "Permitir el grupo si la docente lo administra, desactiva mensajes de estudiantes y lo usa solo para avisos académicos.",
-      "B": "Sugerir que se use temporalmente mientras se activa Classroom, siempre que no se compartan calificaciones ni imágenes.",
-      "C": "Recomendar que cada familia decida si el estudiante participa, porque el centro no puede controlar todos los medios de comunicación.",
+      "A": "Permitir el grupo si lo administra la docente, se prohíben mensajes entre estudiantes y se limita a recordatorios académicos.",
+      "B": "Autorizarlo de manera temporal mientras se normaliza el acceso a Classroom, dejando reglas escritas y evitando imágenes o calificaciones.",
+      "C": "Usarlo con familias en lugar de estudiantes, siempre que la docente mantenga respaldo de los mensajes importantes.",
       "D": "Revisar lineamientos institucionales, edad, consentimiento, privacidad, finalidad pedagógica, alternativas oficiales y protección de datos antes de implementarlo."
     },
     "answer": "D",
-    "feedback": "El uso de canales con menores exige privacidad, consentimiento, finalidad clara y respeto a lineamientos institucionales."
+    "feedback": "Con menores, la rapidez no basta: se requieren lineamientos, consentimiento, privacidad, finalidad y alternativas seguras."
   },
   {
     "n": 6,
     "text": "Una computadora de la dirección presenta fallas graves al iniciar. Contiene documentos administrativos y registros sensibles. La secretaria solicita formatearla “para resolver rápido” porque necesita trabajar. ¿Cuál es la actuación más responsable?",
     "options": {
-      "A": "Formatear inmediatamente si la computadora no inicia correctamente, ya que la continuidad administrativa requiere una solución rápida.",
-      "B": "Intentar varias reparaciones del sistema sin respaldo, priorizando recuperar el acceso antes de decidir si se protege la información.",
+      "A": "Formatear solo después de intentar una reparación automática, porque si el sistema no responde la prioridad es restablecer el servicio.",
+      "B": "Iniciar desde un medio externo para copiar documentos esenciales y luego decidir si conviene reparar o reinstalar el sistema.",
       "C": "Proteger primero la información, documentar el fallo, realizar diagnóstico básico seguro y escalar si existe riesgo de pérdida o daño mayor.",
-      "D": "Extraer el disco y copiar todo en una memoria USB personal del Dinamizador TIC para garantizar que no se pierdan los archivos."
+      "D": "Trasladar los archivos a una memoria externa institucional y reinstalar el sistema operativo si la dirección autoriza verbalmente."
     },
     "answer": "C",
-    "feedback": "Ante datos sensibles, primero se protege la información y se documenta; no se improvisan acciones que puedan causar pérdida o exposición."
+    "feedback": "Ante datos sensibles, primero se protege la información y se documenta; no se improvisa ni se actúa solo por rapidez."
   },
   {
     "n": 7,
     "text": "En una capacitación docente, varios participantes piden “herramientas modernas” y muestran poco interés en hablar de planificación, evaluación o competencias. ¿Cuál debe ser la estrategia del Dinamizador TIC?",
     "options": {
       "A": "Combinar utilidad práctica con análisis pedagógico, mostrando una herramienta concreta vinculada a propósito, indicadores, actividad, evaluación y evidencias.",
-      "B": "Presentar una lista amplia de herramientas para responder a sus expectativas iniciales y luego enviar orientaciones pedagógicas por escrito.",
-      "C": "Cambiar la capacitación por una charla sobre innovación educativa, para que comprendan primero la importancia del enfoque pedagógico.",
-      "D": "Enseñar herramientas rápidas y motivadoras, porque el interés inicial es clave para que luego se profundice en integración curricular."
+      "B": "Iniciar con demostraciones atractivas de herramientas y cerrar con una reflexión breve sobre cómo podrían vincularse al currículo.",
+      "C": "Seleccionar tres herramientas de alto impacto y pedir a los docentes que diseñen una actividad sencilla con una de ellas.",
+      "D": "Centrar la sesión en una herramienta fácil de usar, para asegurar aplicación inmediata y luego acompañar la parte pedagógica en aula."
     },
     "answer": "A",
-    "feedback": "La formación TIC debe ser práctica, pero siempre conectada con propósito pedagógico, currículo, evaluación y evidencias."
+    "feedback": "La formación TIC debe responder al interés práctico, pero sin separar la herramienta del propósito, indicadores, evaluación y evidencias."
   },
   {
     "n": 8,
     "text": "Durante una clase con celulares autorizados, algunos estudiantes empiezan a consultar páginas no relacionadas. La docente propone prohibir definitivamente el uso de celulares en todas sus clases. ¿Qué recomendación es más adecuada?",
     "options": {
-      "A": "Apoyar la prohibición, porque si el grupo no muestra autorregulación, el uso pedagógico del celular no es viable.",
+      "A": "Apoyar una suspensión temporal del uso de celulares hasta que el grupo demuestre mejores hábitos de autorregulación.",
       "B": "Revisar propósito, normas, tiempos, roles, supervisión, consecuencias, alternativas y condiciones de uso antes de decidir una prohibición general.",
-      "C": "Permitir el uso solo a estudiantes con buen comportamiento, para que el recurso funcione como incentivo positivo.",
-      "D": "Sustituir celulares por proyector, porque el control de pantalla por parte del docente reduce distracciones."
+      "C": "Permitir celulares solo en actividades evaluadas, para que los estudiantes asuman el uso con mayor seriedad.",
+      "D": "Sustituir el uso individual por proyección del docente, manteniendo la actividad TIC sin exposición a distracciones."
     },
     "answer": "B",
-    "feedback": "Antes de prohibir, se revisan condiciones pedagógicas, normas, supervisión y alternativas de gestión responsable."
+    "feedback": "La respuesta profesional no es prohibir de inmediato, sino revisar diseño, normas, supervisión, propósito y alternativas."
   },
   {
     "n": 9,
     "text": "Una docente comparte en un grupo interno una captura de pantalla de una hoja de cálculo con nombres, calificaciones y observaciones de conducta. Dice que lo hizo para pedir ayuda a sus colegas. ¿Qué orientación corresponde?",
     "options": {
-      "A": "Indicarle que use iniciales en próximas ocasiones, ya que el problema principal fue mostrar nombres completos.",
-      "B": "Permitirlo si el grupo es solo de docentes del centro y existe una finalidad pedagógica clara.",
+      "A": "Indicarle que para próximas consultas use iniciales y elimine observaciones sensibles antes de compartir información académica.",
+      "B": "Permitirlo si el grupo es institucional y los docentes tienen responsabilidad directa sobre los estudiantes mencionados.",
       "C": "Explicarle que debe proteger datos personales, retirar la información expuesta, usar canales adecuados y compartir solo lo necesario con acceso limitado.",
-      "D": "Recomendar que convierta el archivo a PDF antes de compartirlo para evitar modificaciones no autorizadas."
+      "D": "Recomendar que comparta el archivo por enlace restringido en vez de captura, para controlar mejor quién puede verlo."
     },
     "answer": "C",
-    "feedback": "Las calificaciones y observaciones son datos personales; deben compartirse solo cuando sea necesario, por canales seguros y con acceso limitado."
+    "feedback": "La finalidad pedagógica no elimina el deber de proteger datos personales y limitar acceso a información sensible."
   },
   {
     "n": 10,
     "text": "El centro recibe una donación de tabletas. Algunos docentes solicitan asignarlas de manera fija a los cursos con mejor disciplina, argumentando que así se cuidarán mejor. ¿Qué postura debe asumir el Dinamizador TIC?",
     "options": {
-      "A": "Aceptar la propuesta si se registra inventario y se garantiza que los cursos responsables mantengan los equipos en buen estado.",
-      "B": "Proponer que se usen solo en actividades institucionales supervisadas, para evitar conflictos por distribución entre grados.",
-      "C": "Asignarlas al Espacio TIC y permitir uso por reserva, sin considerar características de cada actividad para mantener igualdad formal.",
+      "A": "Asignarlas inicialmente a los cursos más responsables y revisar la decisión cada mes según el cuidado demostrado.",
+      "B": "Conservarlas en el Espacio TIC y permitir reservas, priorizando actividades supervisadas para minimizar riesgos.",
+      "C": "Distribuirlas por grado, asignando más equipos a quienes tengan proyectos ya planificados y menos a quienes aún no los tengan.",
       "D": "Establecer criterios transparentes de uso, inventario, responsabilidad, equidad, planificación pedagógica, cuidado, rotación y seguimiento."
     },
     "answer": "D",
-    "feedback": "La gestión de recursos exige criterios transparentes, equidad, cuidado, planificación pedagógica y seguimiento."
+    "feedback": "La gestión de bienes públicos exige equidad, criterios transparentes, inventario, cuidado y uso pedagógico planificado."
   },
   {
     "n": 11,
     "text": "Una docente quiere publicar en redes sociales del centro un video de estudiantes dramatizando situaciones de ciberacoso. Algunos estudiantes aparecen claramente identificables y el guion incluye una situación inspirada en un caso real del aula. ¿Qué debe hacer el Dinamizador TIC?",
     "options": {
-      "A": "Autorizar la publicación si el propósito es preventivo y no se mencionan nombres de estudiantes afectados.",
+      "A": "Autorizar la publicación si el guion no incluye nombres y la intención es preventiva para la comunidad educativa.",
       "B": "Recomendar revisar consentimiento, proteger identidades, evitar casos reconocibles, usar situaciones ficticias y publicar solo por canales autorizados.",
-      "C": "Sugerir publicar solo fragmentos breves del video para reducir la exposición de los estudiantes.",
-      "D": "Pedir que se publique en un grupo cerrado de familias en lugar de una red social abierta."
+      "C": "Sugerir editar el video para dejar solo escenas generales y publicar la versión completa en un espacio cerrado para familias.",
+      "D": "Solicitar que la docente conserve el video como evidencia interna y publique únicamente fotografías grupales de la actividad."
     },
     "answer": "B",
-    "feedback": "La prevención no justifica exponer menores ni casos reconocibles; se debe proteger identidad, consentimiento y dignidad."
+    "feedback": "La prevención no justifica exponer estudiantes ni casos reconocibles; se debe proteger dignidad, identidad y consentimiento."
   },
   {
     "n": 12,
     "text": "Un docente pide instalar una extensión de navegador para una actividad interactiva. La extensión solicita permisos para leer datos de todas las páginas visitadas. El docente afirma que muchos usuarios la recomiendan. ¿Qué decisión es más profesional?",
     "options": {
       "A": "Evaluar permisos, procedencia, finalidad, privacidad, necesidad pedagógica y alternativas más seguras antes de instalarla.",
-      "B": "Instalarla únicamente en la computadora del docente, evitando que los estudiantes la usen directamente.",
-      "C": "Permitir la instalación si se desinstala al terminar la actividad, porque el riesgo sería temporal.",
-      "D": "Consultar reseñas de usuarios y proceder si la calificación pública es alta."
+      "B": "Instalarla únicamente en el equipo del docente y retirar la extensión al terminar la actividad para reducir exposición.",
+      "C": "Permitir su uso si no se inicia sesión en cuentas institucionales durante la actividad.",
+      "D": "Consultar reseñas, verificar calificación pública y pedir autorización a dirección antes de instalarla."
     },
     "answer": "A",
-    "feedback": "Los permisos excesivos requieren análisis de seguridad, privacidad, procedencia y pertinencia pedagógica antes de instalar."
+    "feedback": "Los permisos amplios requieren análisis previo de privacidad, seguridad, procedencia, finalidad y necesidad pedagógica."
   },
   {
     "n": 13,
     "text": "En una jornada de internet seguro, un estudiante comenta frente al grupo que una persona desconocida le pide mantener conversaciones en secreto. Algunos compañeros reaccionan con curiosidad. ¿Cuál actuación es más adecuada?",
     "options": {
-      "A": "Pedirle que muestre los mensajes para analizar señales de riesgo con todo el grupo y convertirlo en aprendizaje real.",
-      "B": "Indicarle que bloquee de inmediato a la persona y continuar la clase para evitar alarmar a los demás.",
-      "C": "Preguntarle detalles básicos frente al grupo para saber si el caso requiere ser reportado.",
+      "A": "Preguntarle si tiene capturas y pedirle que las muestre después de la clase para valorar si se trata de una situación grave.",
+      "B": "Indicarle que bloquee el contacto y usar el caso de forma general para recordar que no deben hablar con desconocidos.",
+      "C": "Tomar nota del caso, cambiar de tema para protegerlo y conversar luego con la docente responsable del grupo.",
       "D": "Escucharlo sin exponerlo, protegerlo, evitar detalles innecesarios en público, informar por vía institucional y orientar a adultos responsables."
     },
     "answer": "D",
-    "feedback": "La prioridad es proteger al estudiante, no exponerlo. Debe actuarse con discreción y por vías institucionales."
+    "feedback": "Cuando hay posible riesgo con un desconocido, se protege al menor, se evita exposición pública y se activa la vía institucional."
   },
   {
     "n": 14,
     "text": "Un docente utiliza videos largos en sus clases TIC y luego pide a los estudiantes hacer un resumen. Al observar la clase, el Dinamizador TIC nota dispersión y poca comprensión. ¿Qué retroalimentación sería más sólida?",
     "options": {
-      "A": "Recomendar videos más cortos, porque la duración es el principal factor que afecta la atención estudiantil.",
-      "B": "Sugerir que use cuestionarios al final del video, para comprobar quién prestó atención.",
+      "A": "Sugerir videos más breves y una guía escrita, porque la duración y la falta de consignas explican buena parte de la dispersión.",
+      "B": "Recomendar preguntas de control al final del video para comprobar atención y convertir la actividad en evidencia evaluable.",
       "C": "Proponer uso activo del video: propósito claro, preguntas previas, pausas, análisis guiado, discusión, aplicación y evidencia de aprendizaje.",
-      "D": "Indicar que los videos deben enviarse para la casa y dedicar el aula únicamente a socializar dudas."
+      "D": "Orientar que los videos se usen como recurso previo y que la clase se dedique a resolver dudas y completar actividades."
     },
     "answer": "C",
-    "feedback": "El video debe integrarse activamente con guía, pausas, análisis, aplicación y evidencia; no ser sustituto pasivo de la clase."
+    "feedback": "El video debe integrarse activamente con propósito, pausas, análisis, interacción, aplicación y evidencia."
   },
   {
     "n": 15,
     "text": "La dirección pide al Dinamizador TIC presentar evidencias de impacto de su trabajo. Tiene registros de asistencia técnica, fotos de talleres y algunas planificaciones ajustadas por docentes. ¿Cuál evidencia sería más fuerte para demostrar impacto profesional?",
     "options": {
       "A": "Sistematizar diagnóstico, acompañamientos, cambios en planificación, evidencias de aula, productos estudiantiles, seguimiento, dificultades y plan de mejora.",
-      "B": "Presentar una galería fotográfica amplia que muestre uso de equipos en distintos grados y actividades.",
-      "C": "Entregar un listado de talleres impartidos y número de docentes participantes, organizado por fecha.",
-      "D": "Mostrar los registros de problemas técnicos resueltos, porque evidencian disponibilidad y apoyo continuo."
+      "B": "Organizar las evidencias existentes por fecha y tipo de actividad, acompañándolas con una breve descripción del apoyo brindado.",
+      "C": "Presentar indicadores de cantidad: talleres realizados, docentes acompañados, equipos usados e incidencias resueltas.",
+      "D": "Seleccionar evidencias visuales de mayor calidad y combinarlas con registros de asistencia técnica firmados."
     },
     "answer": "A",
-    "feedback": "La evidencia de impacto combina diagnóstico, cambios observables, seguimiento, productos, dificultades y mejora continua."
+    "feedback": "El impacto se demuestra mejor con diagnóstico, cambios observables, seguimiento, evidencias de aula y plan de mejora."
   },
   {
     "n": 16,
     "text": "Una docente solicita ayuda para estudiantes con dificultades lectoras mediante una plataforma adaptativa. La herramienta ofrece ejercicios automáticos, pero no permite al docente revisar procesos ni adaptar criterios. ¿Qué debe considerar el Dinamizador TIC?",
     "options": {
-      "A": "Recomendarla si motiva a los estudiantes, porque la práctica frecuente puede compensar la falta de reportes detallados.",
+      "A": "Recomendarla como recurso complementario si se usa fuera del aula y no sustituye la evaluación docente.",
       "B": "Analizar pertinencia curricular, accesibilidad, datos, seguimiento docente, retroalimentación y si debe complementarse o sustituirse por otra estrategia.",
-      "C": "Usarla solo como refuerzo en casa, para no afectar el seguimiento del aula.",
-      "D": "Evitar toda plataforma adaptativa, porque puede clasificar estudiantes y generar exclusión."
+      "C": "Aplicarla solo con estudiantes que necesiten práctica adicional, registrando avances observables por medio de una lista de cotejo.",
+      "D": "Evitar plataformas sin reportes detallados, porque limitan la posibilidad de evidenciar progreso en estudiantes con rezago."
     },
     "answer": "B",
-    "feedback": "Una plataforma debe permitir mediación docente, seguimiento, accesibilidad y alineación curricular; la motivación no basta."
+    "feedback": "La decisión debe integrar pertinencia, accesibilidad, privacidad, seguimiento, retroalimentación y mediación docente."
   },
   {
     "n": 17,
     "text": "Un docente propone usar IA generativa para que los estudiantes creen respuestas sobre un tema y luego las copien en sus cuadernos “para aprender mejor redactadas”. ¿Cuál orientación es más adecuada?",
     "options": {
-      "A": "Permitirlo si luego los estudiantes leen en voz alta las respuestas y corrigen palabras desconocidas.",
-      "B": "Prohibir el uso de IA con estudiantes de primaria, porque todavía no tienen criterio suficiente para verificarla.",
+      "A": "Permitir el uso si los estudiantes identifican palabras nuevas, verifican dos datos y explican oralmente lo copiado.",
+      "B": "Limitar la IA a una demostración del docente, evitando que los estudiantes la usen directamente para producir respuestas.",
       "C": "Rediseñar la actividad para que la IA sea apoyo de comparación, generación de ideas o revisión, exigiendo explicación propia, verificación y reflexión.",
-      "D": "Aceptarla como actividad inicial, siempre que no se use como evaluación final."
+      "D": "Autorizarla solo como actividad no calificable, para evitar que afecte la validez de la evaluación."
     },
     "answer": "C",
-    "feedback": "La IA debe apoyar pensamiento, comparación y revisión; no sustituir la producción ni la comprensión del estudiante."
+    "feedback": "La IA debe apoyar pensamiento y revisión, no sustituir la producción ni la comprensión del estudiante."
   },
   {
     "n": 18,
     "text": "Un docente quiere usar una plataforma externa que pide nombre completo, fecha de nacimiento, correo personal y fotografía de estudiantes. La plataforma ofrece actividades muy atractivas. ¿Qué decisión es más adecuada?",
     "options": {
-      "A": "Usarla si las familias autorizan, porque el consentimiento resuelve el principal problema de privacidad.",
-      "B": "Usarla solo con estudiantes que ya tengan correo personal, evitando crear nuevas cuentas.",
-      "C": "Proyectarla desde la cuenta del docente, para que los estudiantes no tengan que registrarse.",
+      "A": "Usarla solo si se consigue consentimiento familiar y se configura el perfil de los estudiantes con la menor visibilidad posible.",
+      "B": "Evitar el registro de estudiantes y usar la cuenta del docente para proyectar las actividades cuando sea viable.",
+      "C": "Solicitar autorización de dirección y familias, ya que la utilidad pedagógica puede justificar el registro si existe consentimiento.",
       "D": "Evaluar finalidad, datos solicitados, edad, privacidad, condiciones, consentimiento, alternativas institucionales y necesidad pedagógica antes de recomendarla."
     },
     "answer": "D",
-    "feedback": "El consentimiento no basta; hay que evaluar minimización de datos, edad, privacidad, finalidad, necesidad y alternativas seguras."
+    "feedback": "El consentimiento no basta: hay que valorar minimización de datos, necesidad, edad, condiciones, privacidad y alternativas seguras."
   },
   {
     "n": 19,
     "text": "Durante una clase en el Espacio TIC, un equipo muestra ventanas emergentes y redireccionamientos a páginas sospechosas. El docente desea continuar porque los estudiantes están trabajando una tarea evaluativa. ¿Qué debe hacerse?",
     "options": {
       "A": "Retirar el equipo de uso, proteger información, registrar la incidencia, revisar de forma segura y ofrecer alternativa pedagógica al grupo afectado.",
-      "B": "Continuar la actividad, siempre que los estudiantes no hagan clic en las ventanas emergentes.",
-      "C": "Reiniciar el equipo y volver a abrir la plataforma, observando si el problema se repite.",
-      "D": "Cambiar al estudiante a otro equipo y dejar el equipo afectado encendido para revisarlo después."
+      "B": "Mover al estudiante a otro equipo y dejar el equipo afectado apagado para revisarlo al final de la clase.",
+      "C": "Cerrar las ventanas emergentes, reiniciar el navegador y continuar si no vuelve a aparecer el problema.",
+      "D": "Suspender la evaluación digital para todo el grupo y sustituirla por una actividad impresa equivalente."
     },
     "answer": "A",
-    "feedback": "Se debe prevenir daño, proteger información, registrar la incidencia y ofrecer alternativa sin exponer a estudiantes."
+    "feedback": "Ante señales de posible malware o redirecciones, se retira el equipo, se protege información, se registra y se ofrece alternativa."
   },
   {
     "n": 20,
     "text": "Una docente dice que sus estudiantes “aprendieron mucho” porque crearon infografías digitales visualmente atractivas. Al revisarlas, hay errores conceptuales y fuentes no verificadas. ¿Cuál retroalimentación corresponde?",
     "options": {
-      "A": "Reconocer el diseño y sugerir corregir ortografía, porque los errores conceptuales pueden abordarse oralmente.",
+      "A": "Reconocer el diseño y pedir una segunda versión corregida, manteniendo la calificación del componente creativo.",
       "B": "Valorar la producción, pero reforzar criterios de contenido, fuentes, síntesis, verificación, claridad comunicativa y revisión antes de publicar o evaluar.",
-      "C": "Indicar que la herramienta no fue adecuada, porque el diseño visual distrajo del contenido académico.",
-      "D": "Recomendar que las próximas infografías se hagan en papel para que se concentren más en el contenido."
+      "C": "Explicar que una infografía no debe evaluarse hasta que el docente revise previamente la información y las fuentes utilizadas.",
+      "D": "Recomendar que el próximo producto combine infografía y defensa oral para detectar errores conceptuales durante la exposición."
     },
     "answer": "B",
-    "feedback": "Una infografía debe comunicar conocimiento confiable; el diseño no compensa errores de contenido o fuentes débiles."
+    "feedback": "La calidad visual no compensa errores conceptuales; se requieren fuentes, verificación, síntesis y claridad comunicativa."
   },
   {
     "n": 21,
     "text": "En una reunión, se plantea que el Dinamizador TIC debe encargarse de “hacer las tareas digitales” de los docentes con menor competencia tecnológica. ¿Qué postura es más adecuada?",
     "options": {
-      "A": "Aceptar temporalmente, porque permite que los estudiantes reciban actividades digitales de calidad mientras los docentes aprenden.",
-      "B": "Hacer solo las tareas de docentes que están próximos a ser acompañados, para garantizar transferencia posterior.",
-      "C": "Negarse completamente, porque el Dinamizador TIC no debe intervenir en la planificación docente.",
+      "A": "Aceptar al inicio del año escolar y planificar talleres posteriores para transferir progresivamente la responsabilidad.",
+      "B": "Elaborar plantillas digitales comunes para que los docentes solo adapten contenido y eviten errores técnicos.",
+      "C": "Apoyar únicamente a los docentes que ya hayan intentado diseñar la actividad por su cuenta.",
       "D": "Acompañar, modelar, co-diseñar y transferir autonomía, sin sustituir la responsabilidad pedagógica del docente."
     },
     "answer": "D",
-    "feedback": "El Dinamizador TIC acompaña y desarrolla autonomía; no sustituye la responsabilidad pedagógica del docente."
+    "feedback": "El Dinamizador TIC acompaña y desarrolla autonomía, pero no sustituye la responsabilidad profesional del docente."
   },
   {
     "n": 22,
     "text": "Una familia informa que su hijo participa en retos virales y le preocupa que se exponga para ganar seguidores. ¿Qué orientación debe dar el centro desde el área TIC?",
     "options": {
-      "A": "Recomendar eliminar todas las redes y prohibir cualquier grabación fuera del aula.",
-      "B": "Pedir al estudiante que muestre qué retos sigue para evaluar si realmente son peligrosos.",
+      "A": "Recomendar retirar temporalmente redes sociales y fortalecer la supervisión familiar hasta que el estudiante comprenda los riesgos.",
+      "B": "Pedir a la familia evidencias del tipo de retos para valorar el nivel de riesgo y decidir si se involucra al centro.",
       "C": "Orientar sobre presión social, validación digital, autocuidado, privacidad, diálogo familiar, señales de riesgo y actuación institucional si hay peligro.",
-      "D": "Explicar que el tema corresponde a la familia, salvo que el estudiante use uniforme escolar o mencione el centro."
+      "D": "Sugerir que se aborde desde orientación escolar, dejando al área TIC solo la parte de privacidad y configuración de cuentas."
     },
     "answer": "C",
-    "feedback": "El abordaje debe ser preventivo y formativo: presión social, autocuidado, diálogo, privacidad y actuación si hay riesgo."
+    "feedback": "La respuesta debe ser preventiva, formativa e integral: presión social, autocuidado, privacidad, familia y ruta institucional si hay riesgo."
   },
   {
     "n": 23,
     "text": "Un docente quiere aplicar una evaluación en Google Forms. La conectividad del centro es inestable y varios estudiantes no tienen dispositivos propios. ¿Cuál planificación es más profesional?",
     "options": {
-      "A": "Aplicar el formulario a quienes puedan conectarse y evaluar luego a los demás de forma oral.",
+      "A": "Aplicar primero el formulario a quienes tengan acceso y programar una segunda oportunidad para los demás.",
       "B": "Preparar alternativa offline o impresa, probar conectividad, prever organización por turnos o equipos, y cuidar la validez y equidad de la evaluación.",
-      "C": "Posponer toda evaluación digital hasta que exista conectividad estable.",
-      "D": "Pedir apoyo a las familias para que los estudiantes lleven datos móviles ese día."
+      "C": "Cambiar Google Forms por una actividad grupal proyectada, para que todos respondan en un mismo dispositivo.",
+      "D": "Mantener la evaluación digital, pero no penalizar a quienes no puedan completarla por problemas técnicos."
     },
     "answer": "B",
-    "feedback": "La evaluación debe prever conectividad, acceso, equidad, alternativas y validez; no puede depender de condiciones desiguales."
+    "feedback": "Una evaluación debe prever conectividad, acceso, alternativas, validez y equidad."
   },
   {
     "n": 24,
     "text": "La dirección solicita una política básica para el uso del Espacio TIC. ¿Cuál conjunto de elementos sería más completo?",
     "options": {
       "A": "Propósito pedagógico, normas de uso, reservas, responsabilidades, inventario, cuidado, seguridad, préstamo, evidencias, incidencias y seguimiento.",
-      "B": "Horario semanal, lista de docentes autorizados, normas de limpieza y prohibición de alimentos.",
-      "C": "Registro de préstamos, control de llaves, inventario físico y sanciones por daños.",
-      "D": "Reglamento de comportamiento estudiantil, cuidado de equipos y calendario de mantenimiento."
+      "B": "Horario de reserva, normas de comportamiento, responsables de llaves, control de equipos y registro de daños.",
+      "C": "Inventario, protocolo de préstamos, sanciones por deterioro, limpieza del espacio y calendario de mantenimiento.",
+      "D": "Normas de uso estudiantil, turnos docentes, registro de asistencia, control de software y prohibición de alimentos."
     },
     "answer": "A",
-    "feedback": "Una política completa integra uso pedagógico, gestión, seguridad, inventario, evidencias, incidencias y seguimiento."
+    "feedback": "Una política completa integra pedagogía, gestión, inventario, seguridad, evidencias, incidencias y seguimiento."
   },
   {
     "n": 25,
     "text": "Una docente quiere usar Padlet para opiniones sobre convivencia escolar. El muro estaría abierto con comentarios visibles automáticamente. ¿Qué debe orientar el Dinamizador TIC?",
     "options": {
-      "A": "Activarlo con nombres visibles para que cada estudiante se responsabilice de lo que escriba.",
-      "B": "Permitir comentarios anónimos para que todos expresen con libertad sus experiencias.",
+      "A": "Activar comentarios visibles con nombres para fomentar responsabilidad y trazabilidad de la participación.",
+      "B": "Permitir participación anónima, pero revisar el muro al final para identificar patrones de convivencia.",
       "C": "Definir propósito, normas, moderación, privacidad, lenguaje respetuoso, manejo de experiencias sensibles y seguimiento institucional si surge un caso.",
-      "D": "Cambiar Padlet por una encuesta cerrada, porque los temas de convivencia no deben abrirse a discusión digital."
+      "D": "Cambiar la actividad por preguntas cerradas para reducir exposición y mantener evidencia del tema tratado."
     },
     "answer": "C",
-    "feedback": "Temas sensibles requieren moderación, privacidad, normas claras, finalidad pedagógica y seguimiento institucional."
+    "feedback": "Temas sensibles requieren moderación, privacidad, normas, finalidad clara y ruta de seguimiento si surge un caso."
   },
   {
     "n": 26,
     "text": "Un docente insiste en instalar un programa educativo descargado de una página no oficial porque lo necesita para la clase siguiente. ¿Cuál respuesta es más adecuada?",
     "options": {
-      "A": "Instalarlo en un solo equipo de prueba, sin conexión a internet, para comprobar si funciona sin afectar a todo el centro.",
-      "B": "Permitir que el docente lo instale bajo su responsabilidad, dejando constancia en un registro de incidencia.",
-      "C": "Descargarlo desde una memoria USB externa para evitar que el navegador bloquee la página.",
+      "A": "Probarlo en un equipo sin datos sensibles y verificar si el antivirus detecta riesgos antes de usarlo con estudiantes.",
+      "B": "Permitir que el docente lo use desde su propio equipo, evitando comprometer computadoras institucionales.",
+      "C": "Instalarlo solo si dirección autoriza, dejando constancia de que fue una necesidad pedagógica puntual.",
       "D": "Revisar procedencia, licencia, seguridad, compatibilidad y necesidad pedagógica; si no es confiable, buscar alternativa segura."
     },
     "answer": "D",
-    "feedback": "No debe instalarse software no verificado; se revisa seguridad, licencia y pertinencia, y se busca alternativa segura."
+    "feedback": "La urgencia no justifica instalar software no verificado; se revisa procedencia, licencia, seguridad y alternativas."
   },
   {
     "n": 27,
     "text": "Un estudiante crea un perfil falso con el nombre de un compañero. La docente propone tratarlo como “una broma pesada” y pedir disculpas. ¿Qué debe orientar el Dinamizador TIC?",
     "options": {
-      "A": "Resolverlo con disculpa si no hubo publicaciones ofensivas ni daño visible.",
+      "A": "Solicitar disculpa y reforzar ciudadanía digital si no hubo publicaciones ofensivas ni difusión amplia.",
       "B": "Recoger evidencia, proteger al afectado, reportar la cuenta, informar por vía institucional y trabajar identidad digital y responsabilidad.",
-      "C": "Pedir al estudiante afectado que publique una aclaración desde su cuenta real.",
-      "D": "Suspender el acceso a internet del estudiante responsable durante el resto del trimestre."
+      "C": "Pedir que el estudiante responsable elimine el perfil frente a la docente y realice una reflexión escrita.",
+      "D": "Informar a las familias y suspender el acceso del estudiante responsable a actividades digitales por un periodo definido."
     },
     "answer": "B",
-    "feedback": "La suplantación afecta identidad digital y privacidad; se documenta, protege, reporta y canaliza institucionalmente."
+    "feedback": "La suplantación afecta identidad y privacidad; se documenta, protege, reporta y se trabaja responsabilidad digital."
   },
   {
     "n": 28,
     "text": "Una docente desea hacer aula invertida usando videos en casa. Sin embargo, el diagnóstico muestra que varios estudiantes no tienen internet estable. ¿Qué ajuste es más pertinente?",
     "options": {
       "A": "Adaptar el modelo con recursos descargados legalmente, materiales impresos, visualización en el centro y actividades presenciales de aplicación.",
-      "B": "Mantener los videos en casa y flexibilizar la fecha de entrega para quienes tengan dificultad de conexión.",
-      "C": "Cambiar el aula invertida por exposición docente, porque el modelo requiere conectividad familiar.",
-      "D": "Pedir a estudiantes con internet que compartan los videos con sus compañeros por mensajería."
+      "B": "Mantener videos en casa, pero ofrecer más tiempo a quienes no puedan acceder el mismo día.",
+      "C": "Enviar el material por mensajería en archivos comprimidos para facilitar la descarga desde celulares familiares.",
+      "D": "Usar el aula invertida solo con estudiantes que tengan acceso, mientras el resto trabaja actividades equivalentes en el aula."
     },
     "answer": "A",
-    "feedback": "El aula invertida puede adaptarse con recursos offline, impresos y momentos en el centro para garantizar equidad."
+    "feedback": "El aula invertida puede adaptarse para garantizar equidad: recursos offline, impresos, visualización en el centro y aplicación presencial."
   },
   {
     "n": 29,
     "text": "Un docente usa Classroom para publicar tareas, pero no revisa ni retroalimenta entregas durante semanas. Afirma que “lo importante es que los estudiantes se acostumbren a la plataforma”. ¿Qué retroalimentación corresponde?",
     "options": {
-      "A": "Valorar el uso de Classroom como primer paso y sugerir revisar tareas solo al cierre de cada unidad.",
-      "B": "Pedir que use la plataforma únicamente para avisos, evitando tareas si no puede revisarlas con rapidez.",
-      "C": "Recomendar que los estudiantes se autocorrijan entre ellos mientras el docente revisa acumulados.",
+      "A": "Reconocer el avance inicial y sugerir una frecuencia mínima de revisión para evitar acumulación de tareas.",
+      "B": "Proponer usar Classroom solo para tareas cortas y dejar las actividades complejas para revisión presencial.",
+      "C": "Recomendar rúbricas automáticas y coevaluación para reducir la carga de revisión docente.",
       "D": "Explicar que usar plataforma exige seguimiento, retroalimentación, criterios, revisión oportuna y uso pedagógico de la información."
     },
     "answer": "D",
-    "feedback": "La plataforma no es solo repositorio; requiere criterios, seguimiento, retroalimentación y uso pedagógico de evidencias."
+    "feedback": "La plataforma no es solo repositorio; exige seguimiento, criterios, retroalimentación y uso de evidencias."
   },
   {
     "n": 30,
     "text": "El centro quiere una campaña de internet seguro. Algunos docentes proponen mostrar ejemplos de retos virales peligrosos para impactar al alumnado. ¿Qué decisión es más responsable?",
     "options": {
-      "A": "Mostrar ejemplos reales sin instrucciones, porque conocerlos ayuda a reconocer el peligro.",
-      "B": "Usar solo los nombres de retos conocidos, sin discutir presión social ni autocuidado.",
+      "A": "Mostrar solo imágenes o titulares generales, evitando videos o pasos específicos.",
+      "B": "Mencionar que existen retos peligrosos, pero no profundizar para evitar curiosidad innecesaria.",
       "C": "Abordar riesgos sin detallar prácticas peligrosas, trabajando pensamiento crítico, presión de grupo, autocuidado, confianza y búsqueda de ayuda.",
-      "D": "Evitar completamente el tema de retos virales para no despertar curiosidad."
+      "D": "Sustituir el tema por seguridad de contraseñas y privacidad, porque los retos virales pueden resultar imitables."
     },
     "answer": "C",
-    "feedback": "Se deben abordar riesgos sin describir prácticas peligrosas; el foco es autocuidado, pensamiento crítico y búsqueda de ayuda."
+    "feedback": "Se deben abordar riesgos sin detallar prácticas peligrosas, priorizando autocuidado, presión social y búsqueda de ayuda."
   },
   {
     "n": 31,
     "text": "Una docente desea evaluar un proyecto TIC grupal solo con la presentación final. El Dinamizador TIC observa que algunos estudiantes no participaron en el proceso. ¿Qué debe recomendar?",
     "options": {
-      "A": "Evaluar el producto final, pero pedir al grupo que explique oralmente cómo se organizó.",
+      "A": "Pedir defensa oral individual después de la presentación para identificar quién domina realmente el contenido.",
       "B": "Incorporar evidencias de proceso, roles, aportes individuales, coevaluación, producto, reflexión y criterios claros desde el inicio.",
-      "C": "Calificar individualmente solo a quienes expongan, porque son los que demuestran dominio.",
-      "D": "Repetir la actividad en grupos más pequeños para que sea más fácil verificar participación."
+      "C": "Solicitar bitácora grupal y ajustar la calificación según la exposición final de cada estudiante.",
+      "D": "Reducir el tamaño de los grupos y asignar funciones obligatorias para evitar que algunos estudiantes queden sin participar."
     },
     "answer": "B",
-    "feedback": "Un proyecto TIC debe evaluar proceso, roles, aportes, producto, coevaluación y reflexión, no solo presentación final."
+    "feedback": "La evaluación de proyectos debe incluir proceso, roles, evidencias individuales, coevaluación, producto y reflexión."
   },
   {
     "n": 32,
     "text": "En un taller docente, una maestra con baja competencia digital se frustra porque no sigue el ritmo. Otros docentes avanzan rápido. ¿Qué debe hacer el Dinamizador TIC?",
     "options": {
       "A": "Diferenciar apoyos, ofrecer guía paso a paso, pares tutores, retos de extensión para avanzados y seguimiento situado.",
-      "B": "Mantener el ritmo general para no afectar a los docentes que sí avanzan.",
-      "C": "Pedir a la docente que observe y practique luego de manera individual.",
-      "D": "Dividir permanentemente el grupo entre “básicos” y “avanzados” para futuras capacitaciones."
+      "B": "Reducir el ritmo general y asegurar que todos completen los mismos pasos antes de avanzar.",
+      "C": "Asignar a los docentes avanzados como tutores permanentes para que el facilitador pueda continuar la sesión.",
+      "D": "Programar una sesión aparte para docentes principiantes y continuar el taller actual según lo planificado."
     },
     "answer": "A",
-    "feedback": "La formación debe diferenciar apoyos, sostener la participación y ofrecer retos adecuados a distintos niveles."
+    "feedback": "La formación situada diferencia apoyos, sostiene la participación y ofrece retos a distintos niveles."
   },
   {
     "n": 33,
     "text": "Una computadora compartida del centro tiene sesiones abiertas de varias cuentas institucionales y contraseñas guardadas en el navegador. ¿Qué acción corresponde?",
     "options": {
-      "A": "Cerrar las sesiones y dejar una nota general recordando a los docentes que deben cuidar sus cuentas.",
-      "B": "Borrar el historial del navegador y reiniciar el equipo para reducir exposición inmediata.",
+      "A": "Cerrar sesiones y colocar una guía visible de buenas prácticas para equipos compartidos.",
+      "B": "Eliminar historial y cookies, reiniciar el navegador y comunicar a los docentes que deben cerrar sesión.",
       "C": "Cerrar sesiones, eliminar credenciales guardadas, informar a usuarios, recomendar cambios si hubo riesgo y reforzar normas de equipos compartidos.",
-      "D": "Desactivar temporalmente el internet del equipo hasta que cada docente cambie su contraseña."
+      "D": "Desactivar temporalmente el guardado de contraseñas y pedir a dirección una circular sobre seguridad de cuentas."
     },
     "answer": "C",
-    "feedback": "En equipos compartidos se cierran sesiones, eliminan credenciales, se informa a usuarios y se refuerzan normas de seguridad."
+    "feedback": "Hay que cerrar sesiones, eliminar credenciales, informar a usuarios, recomendar cambios si hubo riesgo y reforzar normas."
   },
   {
     "n": 34,
     "text": "Un docente desea usar una plataforma de juegos educativos que permite chat abierto con usuarios externos. Él afirma que supervisará durante la clase. ¿Cuál decisión es más adecuada?",
     "options": {
-      "A": "Permitirla si se usa solo durante la clase y con indicaciones claras de no compartir datos personales.",
-      "B": "Usarla proyectada desde la cuenta del docente, sin que los estudiantes entren individualmente.",
-      "C": "Aceptarla solo con estudiantes de mayor edad y buen comportamiento.",
+      "A": "Autorizarla si el docente proyecta reglas claras antes de iniciar y monitorea el chat durante toda la sesión.",
+      "B": "Usarla con seudónimos y sin datos personales, reduciendo riesgos de identificación.",
+      "C": "Permitirla solo en modo demostración desde la cuenta del docente para evitar participación directa de estudiantes.",
       "D": "Evitarla o desactivar funciones riesgosas; si no es posible, elegir una alternativa educativa más segura."
     },
     "answer": "D",
-    "feedback": "Un chat abierto con externos es un riesgo; debe desactivarse o elegirse una plataforma más segura."
+    "feedback": "La supervisión no elimina el riesgo de chat abierto con externos; debe desactivarse o elegirse una alternativa segura."
   },
   {
     "n": 35,
     "text": "La dirección quiere que el Dinamizador TIC prepare un informe de necesidades tecnológicas. ¿Qué informe sería más útil para tomar decisiones?",
     "options": {
       "A": "Diagnóstico con inventario, estado de equipos, frecuencia de uso, necesidades pedagógicas, riesgos, prioridades, costos estimados y plan de seguimiento.",
-      "B": "Lista de equipos solicitados por docentes, ordenada por cantidad de veces que se han pedido.",
-      "C": "Relación de equipos dañados y recomendación de compra de nuevos dispositivos.",
-      "D": "Informe breve de problemas técnicos frecuentes, acompañado de fotografías como evidencia."
+      "B": "Relación de solicitudes docentes, equipos disponibles, fallas frecuentes y prioridades sugeridas por cada ciclo.",
+      "C": "Inventario actualizado con estado físico de equipos, fotografías, recomendaciones de mantenimiento y lista de recursos faltantes.",
+      "D": "Informe ejecutivo con problemas técnicos recurrentes, impacto en clases y propuesta general de adquisición."
     },
     "answer": "A",
-    "feedback": "Un informe útil combina inventario, estado, uso, necesidades pedagógicas, riesgos, prioridades y seguimiento."
+    "feedback": "Un informe robusto integra inventario, estado, uso, necesidades pedagógicas, riesgos, prioridades, costos y seguimiento."
   },
   {
     "n": 36,
     "text": "Una docente quiere usar imágenes generadas por IA para representar personajes históricos. Algunos estudiantes podrían interpretarlas como retratos reales. ¿Qué orientación corresponde?",
     "options": {
-      "A": "Evitar toda imagen generada por IA en Ciencias Sociales porque puede confundir fuentes históricas.",
+      "A": "Evitar imágenes generadas por IA cuando no existan retratos históricos confiables, para no crear referencias visuales falsas.",
       "B": "Presentarlas como recreaciones, aclarar límites, comparar con fuentes reales y promover análisis crítico de la representación.",
-      "C": "Usarlas si se ven realistas y ayudan a captar la atención del grupo.",
-      "D": "Incluir una nota pequeña al final de la presentación indicando que fueron generadas con IA."
+      "C": "Usarlas si la docente explica verbalmente que son ilustrativas y no las coloca como evidencia histórica.",
+      "D": "Incluir una nota visible indicando que fueron generadas por IA y complementar con una fuente histórica escrita."
     },
     "answer": "B",
-    "feedback": "Las imágenes generadas por IA deben tratarse como recreaciones, no fuentes históricas, y usarse para pensamiento crítico."
+    "feedback": "Lo adecuado es aclarar que son recreaciones, contrastarlas con fuentes reales y usarlas para análisis crítico."
   },
   {
     "n": 37,
     "text": "Un docente pide revisar mensajes privados de estudiantes en una plataforma porque sospecha que están hablando de temas no académicos. ¿Qué debe orientar el Dinamizador TIC?",
     "options": {
-      "A": "Revisarlos solo si la plataforma pertenece al centro y fue usada en una actividad escolar.",
-      "B": "Pedir a los estudiantes que entreguen voluntariamente sus contraseñas para verificar sin conflicto.",
-      "C": "Revisar únicamente conversaciones de estudiantes con antecedentes de indisciplina.",
+      "A": "Revisarlos solo si la plataforma es institucional, los estudiantes conocen normas previas y existe sospecha razonable.",
+      "B": "Solicitar autorización de dirección y familias antes de cualquier revisión de mensajes privados.",
+      "C": "Revisar únicamente metadatos o actividad general, evitando leer conversaciones salvo que aparezca un riesgo mayor.",
       "D": "Actuar con finalidad legítima, mínima intervención, normas claras, autorización institucional, protección de derechos y canales correspondientes."
     },
     "answer": "D",
-    "feedback": "La revisión de comunicaciones exige legitimidad, mínima intervención, normas claras, protección de derechos y canal institucional."
+    "feedback": "Cualquier intervención en comunicaciones privadas requiere finalidad legítima, mínima intervención, autorización y protección de derechos."
   },
   {
     "n": 38,
     "text": "Una docente desea usar TIC con estudiantes que tienen ritmos muy distintos. Propone la misma actividad digital para todos y el mismo tiempo de entrega. ¿Qué ajuste es más adecuado?",
     "options": {
-      "A": "Mantener igualdad de condiciones, porque cambiar tiempos o apoyos puede considerarse ventaja injusta.",
-      "B": "Separar a los estudiantes con mayor dificultad y asignarles una tarea digital más simple.",
+      "A": "Mantener la misma meta y tiempo, pero permitir apoyo entre pares para quienes avancen más lento.",
+      "B": "Organizar grupos homogéneos por nivel digital para adaptar mejor las instrucciones de cada equipo.",
       "C": "Ofrecer apoyos diferenciados, recursos multimodales, tiempos razonables, retos de extensión y formas variadas de demostrar aprendizaje.",
-      "D": "Evaluar únicamente el producto final, para evitar complicar el seguimiento del proceso."
+      "D": "Asignar una actividad base común y una actividad complementaria voluntaria para quienes terminen antes."
     },
     "answer": "C",
     "feedback": "La equidad requiere apoyos diferenciados, recursos multimodales, tiempos razonables y distintas formas de demostrar aprendizaje."
@@ -972,75 +1023,76 @@
     "n": 39,
     "text": "Un docente recibe un correo que aparenta ser del MINERD y solicita actualizar su contraseña en un enlace. El diseño y el logo parecen reales. ¿Qué debe recomendar el Dinamizador TIC?",
     "options": {
-      "A": "Cambiar la contraseña desde el enlace si el correo usa lenguaje institucional y no tiene errores evidentes.",
+      "A": "Entrar al enlace solo para verificar el dominio, sin escribir la contraseña ni descargar archivos.",
       "B": "No acceder desde el enlace, verificar remitente y canal oficial, reportar sospecha y reforzar medidas contra phishing.",
-      "C": "Reenviar el correo a otros docentes para saber si también lo recibieron.",
-      "D": "Entrar al enlace, pero no escribir la contraseña hasta verificar si la página tiene HTTPS."
+      "C": "Consultar a otros docentes si recibieron el mismo correo antes de decidir si se trata de un aviso real.",
+      "D": "Cambiar la contraseña desde la página oficial del servicio y luego informar que el correo pudo ser sospechoso."
     },
     "answer": "B",
-    "feedback": "Los correos con enlaces para credenciales pueden ser phishing; se verifica por canal oficial y no se accede desde enlaces sospechosos."
+    "feedback": "Ante posible phishing, no se accede desde el enlace; se verifica por canal oficial y se reporta la sospecha."
   },
   {
     "n": 40,
     "text": "Al cierre del año, el Dinamizador TIC quiere presentar una memoria de su labor. ¿Cuál enfoque reflejaría mejor desempeño profesional?",
     "options": {
       "A": "Integrar diagnóstico inicial, acciones, acompañamientos, formación, soporte, evidencias, impacto, dificultades, aprendizajes y plan de mejora.",
-      "B": "Mostrar fotografías de actividades, cantidad de docentes acompañados y equipos usados durante el año.",
-      "C": "Presentar todos los registros de asistencia técnica, porque evidencian atención continua a necesidades del centro.",
-      "D": "Elaborar un resumen narrativo de actividades realizadas, destacando los logros más visibles."
+      "B": "Organizar actividades por mes, anexar fotografías y destacar docentes que integraron TIC con mayor frecuencia.",
+      "C": "Presentar registros de asistencia técnica, talleres, recursos prestados y publicaciones institucionales vinculadas a tecnología.",
+      "D": "Redactar una narrativa de logros, dificultades y recomendaciones, acompañada de evidencias visuales y firmas de participación."
     },
     "answer": "A",
-    "feedback": "Una memoria profesional integra diagnóstico, acciones, evidencias, impacto, dificultades, aprendizajes y plan de mejora."
+    "feedback": "Una memoria profesional evidencia diagnóstico, acciones, impacto, dificultades, aprendizajes y plan de mejora."
   }
 ];
     const TOTAL_SECONDS = 60 * 60;
     const POINTS_PER_ITEM = 1.25;
 
     let current = 0;
-    let selectedTemp = null;
     let answers = Array(QUESTIONS.length).fill(null);
-    let locked = Array(QUESTIONS.length).fill(false);
     let started = false;
     let ended = false;
+    let reviewMode = false;
     let timeLeft = TOTAL_SECONDS;
     let timerInterval = null;
 
     const $ = (id) => document.getElementById(id);
 
-    function buildProgressPanel() {
-      const panel = $("progressPanel");
-      panel.innerHTML = "";
-      QUESTIONS.forEach((q, i) => {
-        const box = document.createElement("div");
-        box.className = "qbox";
-        box.textContent = q.n;
-        box.title = "Pregunta " + q.n;
-        box.onclick = () => {
-          if (!started || ended) return;
-          current = i;
+    function buildNav() {
+      const nav = $("navGrid");
+      nav.innerHTML = "";
+      QUESTIONS.forEach((q, index) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "nav-item";
+        btn.textContent = q.n;
+        btn.title = "Pregunta " + q.n;
+        btn.onclick = () => {
+          if (!started) return;
+          current = index;
           renderQuestion();
         };
-        panel.appendChild(box);
+        nav.appendChild(btn);
       });
-      updateProgressPanel();
+      updateNav();
     }
 
-    function updateProgressPanel() {
-      const boxes = document.querySelectorAll(".qbox");
-      boxes.forEach((box, i) => {
-        box.classList.toggle("answered", !!answers[i]);
-        box.classList.toggle("current", i === current && started && !ended);
+    function updateNav() {
+      const items = document.querySelectorAll(".nav-item");
+      items.forEach((item, i) => {
+        item.classList.toggle("answered", !!answers[i]);
+        item.classList.toggle("current", i === current && started && !ended);
       });
-      const answered = answers.filter(Boolean).length;
-      $("answeredCounter").textContent = `Respondidas: ${answered}/${QUESTIONS.length}`;
+      $("answeredInfo").textContent = `Respondidas: ${answers.filter(Boolean).length}/${QUESTIONS.length}`;
     }
 
     function startExam() {
       started = true;
       ended = false;
+      reviewMode = false;
       $("startScreen").classList.add("hidden");
       $("quizScreen").classList.remove("hidden");
-      buildProgressPanel();
+      $("resultScreen").classList.add("hidden");
+      buildNav();
       renderQuestion();
       startTimer();
     }
@@ -1049,7 +1101,7 @@
       updateTimer();
       timerInterval = setInterval(() => {
         if (ended) return;
-        timeLeft--;
+        timeLeft -= 1;
         updateTimer();
         if (timeLeft <= 0) {
           finishExam(true);
@@ -1058,130 +1110,100 @@
     }
 
     function updateTimer() {
-      const min = Math.floor(timeLeft / 60);
-      const sec = timeLeft % 60;
-      $("timer").textContent = `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
-      $("timer").classList.toggle("danger", timeLeft <= 5 * 60);
+      const safe = Math.max(0, timeLeft);
+      const minutes = Math.floor(safe / 60);
+      const seconds = safe % 60;
+      $("timer").textContent = `Tiempo restante: ${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      $("timer").classList.toggle("danger", safe <= 5 * 60);
     }
 
     function renderQuestion() {
       const q = QUESTIONS[current];
-      selectedTemp = answers[current];
-
+      $("currentNumber").textContent = q.n;
       $("questionCounter").textContent = `Pregunta ${current + 1} de ${QUESTIONS.length}`;
       $("questionText").textContent = q.text;
 
-      const optionsDiv = $("options");
-      optionsDiv.innerHTML = "";
+      const isAnswered = !!answers[current];
+      $("questionStatus").textContent = reviewMode
+        ? "Revisión del intento"
+        : (isAnswered ? "Respondida" : "Sin responder");
+      $("questionStatus").classList.toggle("answered", isAnswered);
 
+      const list = $("answerList");
+      list.innerHTML = "";
       Object.entries(q.options).forEach(([letter, text]) => {
-        const opt = document.createElement("div");
-        opt.className = "option";
-        opt.dataset.letter = letter;
+        const row = document.createElement("label");
+        row.className = "answer";
+        row.dataset.letter = letter;
 
-        const letterSpan = document.createElement("span");
-        letterSpan.className = "letter";
-        letterSpan.textContent = letter;
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "q" + q.n;
+        radio.value = letter;
+        radio.checked = answers[current] === letter;
+        radio.disabled = reviewMode;
 
-        const textSpan = document.createElement("span");
-        textSpan.textContent = text;
+        const span = document.createElement("span");
+        span.textContent = `${letter}) ${text}`;
 
-        opt.appendChild(letterSpan);
-        opt.appendChild(textSpan);
+        row.appendChild(radio);
+        row.appendChild(span);
 
-        if (answers[current] === letter) opt.classList.add("selected");
+        if (answers[current] === letter) row.classList.add("selected");
 
-        if (locked[current]) {
-          opt.classList.add("disabled");
-          if (letter === q.answer) opt.classList.add("correct");
-          if (answers[current] === letter && letter !== q.answer) opt.classList.add("incorrect");
+        if (!reviewMode) {
+          row.onclick = () => {
+            answers[current] = letter;
+            renderQuestion();
+          };
         } else {
-          opt.onclick = () => selectOption(letter);
+          if (letter === q.answer) row.classList.add("review-correct");
+          if (answers[current] === letter && letter !== q.answer) row.classList.add("review-wrong");
         }
 
-        optionsDiv.appendChild(opt);
+        list.appendChild(row);
       });
 
-      renderFeedback();
-      updateButtons();
-      updateProgressPanel();
-    }
-
-    function selectOption(letter) {
-      if (locked[current]) return;
-      selectedTemp = letter;
-      document.querySelectorAll(".option").forEach(opt => {
-        opt.classList.toggle("selected", opt.dataset.letter === letter);
-      });
-    }
-
-    function confirmAnswer() {
-      if (locked[current]) return;
-      if (!selectedTemp) {
-        alert("Selecciona una respuesta antes de confirmar.");
-        return;
-      }
-      answers[current] = selectedTemp;
-      locked[current] = true;
-      renderQuestion();
-    }
-
-    function renderFeedback() {
-      const fb = $("feedback");
-      const q = QUESTIONS[current];
-      fb.className = "feedback";
-      fb.innerHTML = "";
-
-      if (!locked[current]) {
-        fb.style.display = "none";
-        return;
-      }
-
-      const isCorrect = answers[current] === q.answer;
-      fb.classList.add(isCorrect ? "good" : "bad");
-      fb.style.display = "block";
-      fb.innerHTML = isCorrect
-        ? `<strong>Correcta.</strong> ${q.feedback}`
-        : `<strong>Incorrecta.</strong> La respuesta correcta es <strong>${q.answer}</strong>. ${q.feedback}`;
-    }
-
-    function updateButtons() {
       $("prevBtn").disabled = current === 0;
       $("nextBtn").disabled = current === QUESTIONS.length - 1;
-      $("confirmBtn").disabled = locked[current];
-      $("finishBtn").textContent = answers.filter(Boolean).length === QUESTIONS.length ? "Finalizar prueba" : "Finalizar prueba";
-    }
-
-    function goPrev() {
-      if (current > 0) {
-        current--;
-        renderQuestion();
-      }
+      updateNav();
     }
 
     function goNext() {
       if (current < QUESTIONS.length - 1) {
-        current++;
+        current += 1;
         renderQuestion();
       }
     }
 
-    function finishExam(auto = false) {
-      if (ended) return;
-      const unanswered = answers.filter(a => !a).length;
-      if (!auto && unanswered > 0) {
-        const ok = confirm(`Tienes ${unanswered} pregunta(s) sin responder. ¿Deseas finalizar de todos modos?`);
-        if (!ok) return;
+    function goPrev() {
+      if (current > 0) {
+        current -= 1;
+        renderQuestion();
       }
+    }
+
+    function finishExam(auto=false) {
+      if (ended) return;
+      const blank = answers.filter(a => !a).length;
+      if (!auto && blank > 0) {
+        const proceed = confirm(`Tiene ${blank} pregunta(s) sin responder. ¿Desea enviar todo y terminar?`);
+        if (!proceed) return;
+      } else if (!auto) {
+        const proceed = confirm("¿Desea enviar todo y terminar? Después verá su puntuación final.");
+        if (!proceed) return;
+      }
+
       ended = true;
+      reviewMode = false;
       clearInterval(timerInterval);
       $("quizScreen").classList.add("hidden");
       $("resultScreen").classList.remove("hidden");
-      document.querySelectorAll(".qbox").forEach(box => box.classList.remove("current"));
+      document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("current"));
       calculateResults(auto);
     }
 
-    function calculateResults(auto) {
+    function calculateResults(auto=false) {
       let correct = 0;
       let blank = 0;
 
@@ -1194,10 +1216,9 @@
       const score = correct * POINTS_PER_ITEM;
       const percent = Math.round((correct / QUESTIONS.length) * 100);
 
-      $("resultName").textContent = $("candidateName").value.trim()
-        ? "Participante: " + $("candidateName").value.trim()
-        : "Participante no identificado";
-      $("scoreOutOf50").textContent = `${score.toFixed(2)}/50`;
+      const participant = $("candidateName").value.trim();
+      $("resultName").textContent = participant ? "Participante: " + participant : "Participante no identificado";
+      $("scoreText").textContent = score.toFixed(2) + "/50";
       $("correctCount").textContent = correct;
       $("wrongCount").textContent = wrong;
       $("blankCount").textContent = blank;
@@ -1205,76 +1226,80 @@
 
       const passed = correct > 25;
       $("verdict").innerHTML = passed
-        ? `<span class="ok">Resultado: Aprobado según el criterio de práctica: más de 25 correctas.</span>`
-        : `<span class="fail">Resultado: No aprobado según el criterio de práctica: se requieren más de 25 correctas.</span>`;
+        ? '<span class="ok">Resultado: Aprobado según el criterio de práctica: más de 25 respuestas correctas.</span>'
+        : '<span class="bad">Resultado: No aprobado según el criterio de práctica: se requieren más de 25 respuestas correctas.</span>';
 
-      let msg = "";
+      let feedback = "";
       if (correct >= 34) {
-        msg = "Desempeño sobresaliente. Evidencias dominio de criterio institucional, integración pedagógica, protección de datos, inclusión y seguimiento.";
+        feedback = "Desempeño sobresaliente. Sus decisiones reflejan criterio pedagógico, institucional, ético y técnico en casos complejos.";
       } else if (correct >= 26) {
-        msg = "Desempeño aprobatorio, pero con margen de mejora. Revisa especialmente las preguntas donde la opción correcta combinaba ética, evidencia, inclusión y vía institucional.";
+        feedback = "Desempeño aprobatorio. Conviene reforzar las preguntas donde la opción correcta combinaba evidencia, protección de datos, inclusión y seguimiento.";
       } else if (correct >= 18) {
-        msg = "Desempeño en proceso. Necesitas fortalecer toma de decisiones en casos complejos, especialmente cuando hay datos sensibles, riesgos digitales o gestión de recursos.";
+        feedback = "Desempeño en proceso. Debe fortalecer toma de decisiones ante casos de privacidad, acompañamiento docente, gestión de recursos y seguridad digital.";
       } else {
-        msg = "Desempeño insuficiente para este simulacro. Requiere estudio sistemático de funciones del Dinamizador TIC, ciudadanía digital, acompañamiento docente y evaluación formativa.";
+        feedback = "Desempeño insuficiente para este simulacro. Requiere repasar funciones del Dinamizador TIC, ciudadanía digital, ética institucional e integración pedagógica.";
       }
-
-      if (auto) msg = "El tiempo terminó. " + msg;
-      $("generalFeedback").textContent = msg;
+      if (auto) feedback = "El tiempo finalizó. " + feedback;
+      $("generalFeedback").textContent = feedback;
 
       const tbody = $("resultTable").querySelector("tbody");
       tbody.innerHTML = "";
       QUESTIONS.forEach((q, i) => {
-        const tr = document.createElement("tr");
         const user = answers[i] || "Sin responder";
         const ok = answers[i] === q.answer;
+        const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${q.n}</td>
           <td>${user}</td>
           <td>${q.answer}</td>
-          <td>${ok ? '<span class="ok">Correcta</span>' : '<span class="fail">Incorrecta</span>'}</td>
+          <td>${ok ? '<span class="ok">Correcta</span>' : '<span class="bad">Incorrecta</span>'}</td>
         `;
         tbody.appendChild(tr);
       });
     }
 
     function reviewExam() {
+      reviewMode = true;
       ended = false;
       $("resultScreen").classList.add("hidden");
       $("quizScreen").classList.remove("hidden");
       current = 0;
       renderQuestion();
-      document.querySelectorAll(".option").forEach(o => o.classList.add("disabled"));
     }
 
     function resetExam() {
-      if (!confirm("¿Seguro que deseas reiniciar el simulacro? Se perderán las respuestas.")) return;
+      const proceed = confirm("¿Seguro que desea reiniciar el intento? Se perderán las respuestas.");
+      if (!proceed) return;
       current = 0;
-      selectedTemp = null;
       answers = Array(QUESTIONS.length).fill(null);
-      locked = Array(QUESTIONS.length).fill(false);
       started = false;
       ended = false;
+      reviewMode = false;
       timeLeft = TOTAL_SECONDS;
       clearInterval(timerInterval);
+      $("timer").textContent = "Tiempo restante: 60:00";
+      $("timer").classList.remove("danger");
       $("resultScreen").classList.add("hidden");
       $("quizScreen").classList.add("hidden");
       $("startScreen").classList.remove("hidden");
-      $("timer").textContent = "60:00";
-      $("timer").classList.remove("danger");
-      buildProgressPanel();
+      buildNav();
     }
 
     document.addEventListener("keydown", (e) => {
-      if (!started || ended) return;
+      if (!started || ended || reviewMode) return;
       const key = e.key.toUpperCase();
-      if (["A", "B", "C", "D"].includes(key) && !locked[current]) selectOption(key);
-      if (e.key === "Enter" && !locked[current]) confirmAnswer();
+      if (["A", "B", "C", "D"].includes(key)) {
+        const q = QUESTIONS[current];
+        if (q.options[key]) {
+          answers[current] = key;
+          renderQuestion();
+        }
+      }
       if (e.key === "ArrowRight") goNext();
       if (e.key === "ArrowLeft") goPrev();
     });
 
-    buildProgressPanel();
+    buildNav();
   </script>
 </body>
 </html>
